@@ -1,0 +1,109 @@
+.content {
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.2);
+    width: 700px;
+    padding: 20px;
+    border-radius: 10px;
+    cursor: default;
+}
+
+.content h1 {
+    font-family: "Russo One", sans-serif;
+    font-weight: lighter;
+    font-size: 20px;
+    color: white;
+    text-align: center;
+}
+
+.form {
+    width: 700px;
+    justify-content: center;
+    align-items: flex-start;
+    display: flex;
+    gap: 80px;
+}
+
+.form h4 {
+    font-family: "Baloo Thambi 2", sans-serif;
+    font-weight: normal;
+    font-size: 18px;
+    color: white;
+    text-align: left;
+    margin-bottom: 0;
+}
+
+.form input,
+.form select {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.3);
+    color: white;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    transition: all 0.3s ease;
+    padding: 10px;
+}
+
+option {
+    color: black;
+}
+
+.form input:hover {
+    cursor: url('../assets/icons/cursor_text.svg'), auto;
+}
+
+.form input::placeholder {
+    color: white;
+    font-family: "Baloo Thambi 2", sans-serif;
+    font-style: italic;
+    opacity: 0.7;
+}
+
+.btn {
+    background-color: #C36E0C;
+    color: white;
+    font-family: "Baloo Thambi 2", sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    width: 200px;
+    height: 50px;
+    transition: background-color 0.5s ease, color 0.5s ease, transform 0.5s ease;
+}
+
+.btn:hover {
+    background-color: #ff8800;
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
+.btn:active {
+    transform: scale(0.95); 
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+}
+
+.alt_peso {
+    display: flex;
+    gap: 10px;
+}
+
+.alt_peso .campo {
+    flex: 1;
+}
+
+.alt_peso input {
+    width: 100px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
