@@ -58,3 +58,11 @@ hr {
     margin-bottom: 10%;
     width: 350px;
 }
+
+.erro {
+    color: #ff8800;
+    font-family: "Baloo Thambi 2", sans-serif;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+}

@@ -20,36 +20,40 @@
             <h2>TREINOS PERSONALIZADOS COM</h2>
             <h2 class="destaque">INTELIGÊNCIA ARTIFICIAL</h2>
         </div>
+        <form onsubmit="return login()">
+            <div class="box">
+                <div class="content">
+                    <h1>Login</h1>
+                    <hr>
+                    <div class="form">
+                        <h4> Email </h4>
+                        <input type="text" name="email" id="email" placeholder="Digite seu email">
+                        <span class="erro" id="erro-email"></span>
 
-        <div class="box">
-            <div class="content">
-                <h1>Login</h1>
-                <hr>
-                <div class="form">
-                    <h4> Email </h4>
-                    <input type="text" name="email" id="email" placeholder="Digite seu email">
-                    <br>
-                    <h4> Senha </h4>        
-                    <input type="password" name="password" id="password" placeholder="Digite sua senha">   
-                    <br>
-                    <a href="#" class="forgot-pass">Esqueci minha senha</a>     
-                    <br><br><br>
-                    <div class="options">
-                        <label class="switch">
-                            <input type="checkbox" id="remember-me">
-                            <span class="slider"></span>
-                            <span class="switch-text">Lembrar de mim</span>
-                        </label>
-                    </div>  
-                </div> 
-            </div>
-            
-            <br><br>
-            <a href="index.html"><button class="btn">Entrar</button></a>
-            
-        </div>        
+                        <h4> Senha </h4>        
+                        <input type="password" name="password" id="password" placeholder="Digite sua senha">  
+                        <span class="erro" id="erro-password"></span>
+                        <a href="#" class="forgot-pass">Esqueci minha senha</a>     
+                        <br><br>
+                        <div class="options">
+                            <label class="switch">
+                                <input type="checkbox" id="remember-me">
+                                <span class="slider"></span>
+                                <span class="switch-text">Lembrar de mim</span>
+                            </label>
+                        </div>  
+                    </div> 
+                </div>
+                
+                <br><br>
+                <button type="submit" class="btn">Entrar</button>
+                
+            </div> 
+        </form>       
     </div>
     
+<script src="../js/global.js"></script>
+<script src="../js/login.js"></script>
 
 </body>
 </html>
