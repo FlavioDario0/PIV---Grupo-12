@@ -26,5 +26,96 @@
         </nav>        
     </header>
 
+    <div class="container">
+        <div class="top-controls">
+
+            <h2>Treino do Dia:  </h2>
+
+            <div class="dias">
+                <button>Seg</button>
+                <button>Ter</button>
+                <button>Qua</button>
+                <button class="ativo">Qui</button>
+                <button>Sex</button>
+                <button>Sab</button>
+                <button>Dom</button>
+            </div>
+
+            <div class="treinos">
+                <button>A</button>
+                <button class="ativo">B</button>
+                <button>C</button>
+            </div>
+
+        </div>
+
+        <div class="content">
+            <div class="table">
+                <div class="table-header">
+                    <span>Exercício</span>
+                    <span>Séries</span>
+                    <span>Repetições</span>
+                    <span>Carga</span>
+                    <span>Status</span>
+                
+                </div>
+
+                <div id="table-body"></div>
+                            
+            </div>
+
+            <aside class="sidebar">
+                
+                <button class="btn"> Adicionar Observação </button>
+
+            </aside>
+        </div>
+
+        <div class="footer">
+            <div class="status">
+                <div class="content-status">
+                    <h3>Status de Conclusão da Semana</h3>
+                    <h3>
+                        Treinos Concluídos: 
+                        <span id="count-atual">0</span>/<span id="count-total">0</span>
+                    </h3>
+                </div>
+                
+                <div class="progress-bar">
+                    <div id="progress"></div>
+                </div>
+            </div>
+                
+            <button class="finish">Concluir Treino</button>
+        </div>
+
+    </div>
+
+    <div id="modal-obs" class="modal hidden">
+        <div class="modal-content">
+            <h3>Observações do treino</h3>
+            <textarea id="input-obs" placeholder="Escreva sua observação..."></textarea>
+            
+            <div class="modal-actions">
+                <button id="cancelar">Cancelar</button>
+                <button id="salvar">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-delete" class="modal hidden">
+        <div class="modal-content">
+            <h3>Excluir observação?</h3>
+            <p>Essa ação não pode ser desfeita.</p>
+
+            <div class="modal-actions">
+                <button id="cancelar-delete">Cancelar</button>
+                <button id="confirmar-delete">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+<script src="../js/global.js"></script>
+<script src="../js/ficha.js"></script>
 </body>
 </html>
