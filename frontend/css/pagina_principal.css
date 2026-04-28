@@ -38,82 +38,33 @@ body {
 }
 
 /* Header */
-.top-nav {
-    background-color: var(--bg-header);
+.logoh {
+    padding: 10px;
+    width: 150px;
+}
+
+.menu a {
+    color: white;
+    font-family: "Russo One", sans-serif;
+    text-decoration: none;
+    margin-left: 50px;
+}
+
+.menu a:hover {
+    color: #ff8800;
+}
+
+.navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 24px 40px;
+    padding: 10px 20px;
+    background: linear-gradient(45deg, #373737, #000000);
     margin-bottom: 30px;
 }
 
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.logo-icon {
-    width: 40px;
-    height: 40px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.circle-1 {
-    width: 40px;
-    height: 40px;
-    border: 2px solid var(--orange);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.circle-2 {
-    width: 26px;
-    height: 26px;
-    border: 2px solid var(--orange);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.circle-3 {
-    width: 10px;
-    height: 10px;
-    background-color: var(--orange);
-    border-radius: 50%;
-}
-
-.logo-text {
-    font-size: 26px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-}
-
-.nav-links {
-    display: flex;
-    gap: 40px;
-}
-
-.nav-links a {
-    color: var(--text-light);
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 15px;
-    transition: color 0.3s;
-}
-
-.nav-links a.active {
-    color: var(--orange);
-}
-
-.nav-links a:hover {
-    color: var(--orange);
+.menu a.ativo {
+    color: #C36E0C;
 }
 
 /* Dashboard Content */
@@ -294,7 +245,8 @@ body {
 }
 
 /* Lists */
-.days-list, .exercises-list {
+.days-list,
+.exercises-list {
     list-style: none;
     display: flex;
     flex-direction: column;
