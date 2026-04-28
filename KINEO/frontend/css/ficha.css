@@ -111,6 +111,15 @@ h3 {
     margin-bottom: 15px;
 }
 
+.btn:hover {
+    background-color: #141414;
+    cursor: pointer;
+}
+
+.btn:active {
+    transform: scale(0.95); 
+}
+
 .finish {
     width: 285px;
     padding: 10px;
@@ -122,6 +131,15 @@ h3 {
     font-family: "Russo One", sans-serif;
     font-weight: normal;
     font-size: 16px;
+}
+
+.finish:hover {
+    background-color: #ff8800;
+    cursor: pointer;
+}
+
+.finish:active {
+    transform: scale(0.95); 
 }
 
 .footer {
@@ -261,6 +279,11 @@ button.ativo {
     font-size: 16px;
 }
 
+#cancelar:hover {
+    background-color: #b6b6b6;
+    cursor: pointer;
+}
+
 #salvar {
     width: 100px;
     padding: 5px;
@@ -272,6 +295,11 @@ button.ativo {
     font-family: "Baloo Thambi 2", sans-serif;
     font-weight: normal;
     font-size: 16px;
+}
+
+#salvar:hover {
+    background-color: #ff8800;
+    cursor: pointer;
 }
 
 .acoes-obs {
@@ -308,6 +336,11 @@ button.ativo {
     font-size: 16px;
 }
 
+#confirmar-delete:hover {
+    background-color: #b6b6b6;
+    cursor: pointer;
+}
+
 #cancelar-delete {
     width: 100px;
     padding: 5px;
@@ -319,6 +352,11 @@ button.ativo {
     font-family: "Baloo Thambi 2", sans-serif;
     font-weight: normal;
     font-size: 16px;
+}
+
+#cancelar-delete:hover {
+    background-color: #ff8800;
+    cursor: pointer;
 }
 
 .texto-obs {
