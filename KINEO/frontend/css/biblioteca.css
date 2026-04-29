@@ -35,17 +35,18 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: white;
+    background-color: #5F5F5F;
     width: 280px;
     height: 20px;
     padding: 8px;
-    border-radius: 8px;
+    border-radius: 20px;
     outline: none;
     border: none;
+    color: white;
 }
 
-.search-box img {
-    color: #111111;
+input::placeholder {
+    color: rgb(209, 209, 209);
 }
 
 .ativo {
