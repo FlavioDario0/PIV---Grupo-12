@@ -41,7 +41,7 @@ function login() {
 
     // SUCESSO
     localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
-    window.location.href = "home.html";
+    window.location.href = "pagina_principal.html";
 
     return false;
 }

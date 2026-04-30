@@ -1,3 +1,7 @@
+html, body {
+    overflow-x: hidden;
+}
+
 .buscar { 
     display: flex;
     align-items: center;
@@ -51,4 +55,192 @@ input::placeholder {
 
 .ativo {
     color: #C36E0C;
+}
+
+#nome-exercicio {
+    margin-left: 30px;
+    color: white;
+    font-family: "Russo One", sans-serif;
+    font-weight: normal;
+}
+
+.container-exercicio {
+    display: flex;
+    margin: 30px;
+}
+
+.col-esquerda {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.conteudo {
+    width: 100%;
+}
+
+.linha-cima {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 90%;
+    margin-left: 20px;
+    height: 250px;
+}
+
+.descricao {
+    width: 700px;
+    height: auto;
+    background: #5F5F5F;
+    border-radius: 20px;
+    padding: 15px;
+    margin-right: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.col-direita {
+    width: 44%;
+    height: 100%;
+}
+
+.equip {
+    width: 460px;
+    height: 97px;
+    background: #5F5F5F;
+    border-radius: 20px;
+    padding: 15px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.nivel {
+    width: 460px;
+    height: 70px;
+    margin-top: 20px;
+    background: #5F5F5F;
+    border-radius: 20px;
+    padding: 15px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.linha-baixo {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    width: 90%;
+    margin-left: 20px;
+    height: 250px;
+    margin-top: 20px;
+    margin-right: 30px;
+}
+
+.musculos {
+    width: 500px;
+    height: auto;
+    background: #5F5F5F;
+    border-radius: 20px;
+    margin-right: 20px;
+    padding: 15px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.erro {
+    width: 627px;
+    height: auto;
+    background: #6F4D26;
+    border-radius: 20px;
+    padding: 15px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.col-esquerda img {
+    width: 250px;
+    height: 250px;
+    border-radius: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+h2 {
+    margin: 5px;
+    font-family: "Russo One", sans-serif;
+    font-weight: normal;
+    color: white;
+    font-size: 30px;
+}
+
+h3 {
+    margin: 0;
+    font-family: "Baloo Thambi 2", sans-serif;
+    color: white;
+    font-size: 20px;
+}
+
+
+span {
+    color: white;
+    font-family: "Baloo Thambi 2", sans-serif;
+    font-size: 18px;
+    font-weight: lighter;
+    white-space: pre-line;
+}
+
+li { 
+    color: white;
+    font-family: "Baloo Thambi 2", sans-serif;
+    font-size: 18px;
+    font-weight: lighter;
+    
+}
+
+ul {
+    margin-top: 0;
+}
+
+.nivel-linha {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 10px; 
+}
+
+.nomes-niveis {
+    color: white;
+    font-family: "Baloo Thambi 2", sans-serif;
+    font-size: 18px;
+}
+
+.cores-niveis {
+    display: flex;
+    gap: 6px;
+}
+
+.classific {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+}
+
+.iniciante {
+    background-color: #6DB141;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.intermediario {
+    background-color: #FBD147;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.avancado {
+    background-color: #E74C3C;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.container-exercicio {
+    display: flex;
+    flex-direction: column;
+    margin: 30px;
+}
+
+.card-body {
+    display: flex;
 }
