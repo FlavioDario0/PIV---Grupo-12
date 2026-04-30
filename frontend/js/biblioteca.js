@@ -8,6 +8,78 @@ window.onload = () => {
 }
 */
 
+let grupoSelecionado = null;
+let textoBusca = "";
+
+window.onload = () => {
+
+    const inputBusca = document.getElementById("input-busca");
+
+    inputBusca.addEventListener("input", () => {
+        console.log("digitando...");
+
+        textoBusca = inputBusca.value.toLowerCase();
+        aplicarFiltros();
+    });
+
+    aplicarFiltros();
+};
+
+
+
+function filtrarGrupo(grupo) {
+    // se clicar no mesmo grupo - desativa
+    if (grupoSelecionado === grupo) {
+        grupoSelecionado = null;
+    } else {
+        grupoSelecionado = grupo;
+    }
+
+    atualizarMenuAtivo(grupoSelecionado);
+    aplicarFiltros();
+}
+
+function aplicarFiltros() {
+    let filtrados = listaCompleta;
+
+    if (grupoSelecionado) {
+        const musculosGrupo = mapaGrupos[grupoSelecionado] || [];
+
+        filtrados = filtrados.filter(e => 
+            musculosGrupo.some(m =>
+                e.musculos.principal.toLowerCase().includes(m)
+            )
+        );
+    }
+
+    if (textoBusca) {
+        filtrados = filtrados.filter(exercicio => {
+            return (
+                exercicio.nome.toLowerCase().includes(textoBusca) ||
+                exercicio.descricao.toLowerCase().includes(textoBusca) ||
+                exercicio.musculos.principal.toLowerCase().includes(textoBusca) ||
+                exercicio.musculos.secundarios.some(m => m.toLowerCase().includes(textoBusca))
+            );
+        });
+    }
+
+    renderizarExercicios(filtrados);
+}
+
+
+function atualizarMenuAtivo(grupo) {
+    const links = document.querySelectorAll(".filtro a");
+
+    links.forEach(link => {
+        link.classList.remove("ativo");
+
+        if (link.dataset.grupo === grupo) {
+            link.classList.add("ativo");
+        }
+    });
+}
+
+
 function renderizarExercicios(lista) {
     const container = document.getElementById("lista-exercicios");
 
@@ -131,4 +203,14 @@ const exerciciosMock = [
     }
 ];
 
-renderizarExercicios(exerciciosMock);
+let listaCompleta = exerciciosMock;
+
+const mapaGrupos = {
+    peito: ["peito"],
+    costas: ["dorsal", "costas"],
+    pernas: ["quadríceps", "glúteo", "posterior"],
+    biceps: ["bíceps"],
+    triceps: ["tríceps"],
+    ombro: ["deltoide", "ombro"],
+    abdomen: ["abdomen"]
+};

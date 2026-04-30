@@ -28,17 +28,17 @@
 
     <div class="buscar">
         <div class="filtro">
-            <a href="" onclick="filtrarGrupo('Peito')" class="ativo">Peito</a>
-            <a href="" onclick="filtrarGrupo('Costas')">Costas</a>
-            <a href="" onclick="filtrarGrupo('Ombro')">Ombro</a>
-            <a href="" onclick="filtrarGrupo('Pernas')">Pernas</a>
-            <a href="" onclick="filtrarGrupo('Biceps')">Bíceps</a>
-            <a href="" onclick="filtrarGrupo('Triceps')">Tríceps</a>
-            <a href="" onclick="filtrarGrupo('Abdomen')">Abdômen</a>
+            <a href="#" data-grupo="peito" onclick="filtrarGrupo('peito'); return false;">Peito</a>
+            <a href="#" data-grupo="costas" onclick="filtrarGrupo('costas'); return false;">Costas</a>
+            <a href="#" data-grupo="ombro" onclick="filtrarGrupo('ombro'); return false;">Ombro</a>
+            <a href="#" data-grupo="pernas" onclick="filtrarGrupo('pernas'); return false;">Pernas</a>
+            <a href="#" data-grupo="biceps" onclick="filtrarGrupo('biceps'); return false;">Bíceps</a>
+            <a href="#" data-grupo="triceps" onclick="filtrarGrupo('triceps'); return false;">Tríceps</a>
+            <a href="#" data-grupo="abdomen" onclick="filtrarGrupo('abdomen'); return false;">Abdômen</a>
 
             <div class="search-box">
                 <img src="../assets/icons/search.svg">
-                <input type="text" placeholder="Pesquisar exercício..." />
+                <input type="text" id="input-busca" placeholder="Pesquisar exercício..." />
             </div>
         </div>
     </div>

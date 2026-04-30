@@ -244,3 +244,16 @@ ul {
 .card-body {
     display: flex;
 }
+
+.filtro a {
+    color: white;
+    transition: 0.2s;
+}
+
+.filtro a.ativo {
+    color: #C36E0C;
+}
+
+.filtro a:hover {
+    color: #ff8800;
+}

@@ -32,6 +32,7 @@ html, body {
 
 .menu a:hover {
     color: #ff8800;
+    transition: 0.2s;
 }
 
 .navbar {
