@@ -18,7 +18,6 @@ async function login() {
     if (!valido) return false;
 
     try {
-        // Envia o e-mail e a senha para o Java validar
         const resposta = await fetch('http://localhost:8080/api/auth/login', {
             method: 'POST',
             headers: {
@@ -28,7 +27,6 @@ async function login() {
         });
 
         if (resposta.ok) {
-            // Sucesso! Vai para a página principal
             window.location.href = "pagina_principal.html";
         } else {
             mostrarErro("erro-password", "E-mail ou senha incorretos");

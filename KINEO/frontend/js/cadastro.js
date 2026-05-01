@@ -84,7 +84,7 @@ async function validarCadastro() {
 
     const dadosCadastro = {
             nome: nome,
-            dataNascimento: dataFormatada, // Formato AAAA-MM-DD
+            dataNascimento: dataFormatada,
             email: email,
             senha: senha,
             objetivo: objetivo,
@@ -95,7 +95,6 @@ async function validarCadastro() {
         };
 
         try {
-            // Envia os dados para a API Java (Ajuste a rota se necessário)
             const resposta = await fetch('http://localhost:8080/api/auth/register', {
                 method: 'POST',
                 headers: {
@@ -113,7 +112,7 @@ async function validarCadastro() {
             }
         } catch (erro) {
             console.error("Erro:", erro);
-            alert("Erro de conexão. Verifique se o backend Java está a rodar!");
+            alert("Erro de conexão");
         }
 
     return false;
@@ -152,10 +151,8 @@ function dataValida(data) {
 function mascaraData(input) {
     let valor = input.value;
 
-    // remove tudo que não é número
     valor = valor.replace(/\D/g, "");
 
-    // adiciona as barras
     if (valor.length > 2) {
         valor = valor.replace(/^(\d{2})(\d)/, "$1/$2");
     }
