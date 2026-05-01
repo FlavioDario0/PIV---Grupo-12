@@ -1,4 +1,4 @@
-function validarCadastro() {   
+async function validarCadastro() {
 
     limparErros();
     
@@ -82,39 +82,39 @@ function validarCadastro() {
 
     if (!valido) return false;
 
-    // LISTA USUÁRIOS
-    let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+    const dadosCadastro = {
+            nome: nome,
+            dataNascimento: dataFormatada, // Formato AAAA-MM-DD
+            email: email,
+            senha: senha,
+            objetivo: objetivo,
+            nivel: nivel,
+            altura: parseFloat(altura),
+            peso: parseFloat(peso),
+            frequencia: frequencia
+        };
 
-    const emailJaExiste = usuarios.some(
-        user => user.email.toLowerCase() === email.toLowerCase()
-    );
+        try {
+            // Envia os dados para a API Java (Ajuste a rota se necessário)
+            const resposta = await fetch('http://localhost:8080/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dadosCadastro)
+            });
 
-    if (emailJaExiste) {
-        mostrarErro("erro-email", "Email já cadastrado");
-        document.getElementById("email").addEventListener("input", () => {
-            mostrarErro("erro-email", "");
-        });
-        return false;
-    }
-
-    // OBJETO
-    const usuario = {
-        nome,
-        dataNasc: dataFormatada,
-        email,
-        senha,
-        objetivo,
-        nivel,
-        altura,
-        peso,
-        frequencia
-    };
-
-    usuarios.push(usuario);
-    localStorage.setItem("usuarios", JSON.stringify(usuarios));
-
-    alert("Cadastro realizado com sucesso!");
-    window.location.href = "login.html";
+            if (resposta.ok) {
+                alert("Cadastro realizado com sucesso!");
+                window.location.href = "login.html";
+            } else {
+                const erroTexto = await resposta.text();
+                mostrarErro("erro-email", "Erro do servidor: " + erroTexto);
+            }
+        } catch (erro) {
+            console.error("Erro:", erro);
+            alert("Erro de conexão. Verifique se o backend Java está a rodar!");
+        }
 
     return false;
 }
