@@ -91,11 +91,11 @@ async function validarCadastro() {
             nivel: nivel,
             altura: parseFloat(altura),
             peso: parseFloat(peso),
-            frequencia: frequencia
+            frequenciaTreinos: frequencia
         };
 
         try {
-            const resposta = await fetch('http://localhost:8080/api/auth/register', {
+            const resposta = await fetch('http://localhost:8080/auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

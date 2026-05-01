@@ -18,7 +18,7 @@ async function login() {
     if (!valido) return false;
 
     try {
-        const resposta = await fetch('http://localhost:8080/api/auth/login', {
+        const resposta = await fetch('http://localhost:8080/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
