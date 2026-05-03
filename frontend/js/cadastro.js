@@ -82,45 +82,44 @@ function validarCadastro() {
 
     if (!valido) return false;
 
-    // LISTA USUÁRIOS
-    let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
-
-    const emailJaExiste = usuarios.some(
-        user => user.email.toLowerCase() === email.toLowerCase()
-    );
-
-    if (emailJaExiste) {
-        mostrarErro("erro-email", "Email já cadastrado");
-        document.getElementById("email").addEventListener("input", () => {
-            mostrarErro("erro-email", "");
-        });
-        return false;
-    }
-
-    // OBJETO
     const usuario = {
-        nome,
-        dataNasc: dataFormatada,
-        email,
-        senha,
-        objetivo,
-        nivel,
-        altura,
-        peso,
-        frequencia
+        nome: nome,
+        dataNascimento: dataFormatada, 
+        email: email,
+        senha: senha,
+        objetivo: objetivo,
+        nivel: nivel,
+        altura: parseFloat(altura),
+        peso: parseFloat(peso),
+        frequenciaTreinos: frequencia 
     };
 
-    usuarios.push(usuario);
-    localStorage.setItem("usuarios", JSON.stringify(usuarios));
-
-    alert("Cadastro realizado com sucesso!");
-    window.location.href = "login.html";
+    fetch("http://localhost:8080/auth/register", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(usuario)
+    })
+    .then(async (resposta) => {
+        if (resposta.ok) {
+            alert("Cadastro realizado com sucesso no Banco de Dados!");
+            window.location.href = "login.html";
+        } else {
+            const erroBackend = await resposta.text();
+            mostrarErro("erro-email", erroBackend || "Erro ao cadastrar.");
+        }
+    })
+    .catch(erro => {
+        console.error("Erro na requisição:", erro);
+        alert("Erro de conexão. O backend Java está rodando?");
+    });
 
     return false;
 }
 
 function formatarData(data) {
-    const partes = data.split("/"); // DD/MM/AAAA
+    const partes = data.split("/"); 
 
     if (partes.length !== 3) return null;
 
@@ -137,7 +136,7 @@ function dataValida(data) {
     if (partes.length !== 3) return false;
 
     const dia = parseInt(partes[0], 10);
-    const mes = parseInt(partes[1], 10) - 1; // JS usa 0-11
+    const mes = parseInt(partes[1], 10) - 1; 
     const ano = parseInt(partes[2], 10);
 
     const dataObj = new Date(ano, mes, dia);
@@ -152,10 +151,8 @@ function dataValida(data) {
 function mascaraData(input) {
     let valor = input.value;
 
-    // remove tudo que não é número
     valor = valor.replace(/\D/g, "");
 
-    // adiciona as barras
     if (valor.length > 2) {
         valor = valor.replace(/^(\d{2})(\d)/, "$1/$2");
     }

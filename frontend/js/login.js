@@ -21,27 +21,32 @@ function login() {
 
     if (!valido) return false;
 
-    let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
 
-    const usuario = usuarios.find(user => 
-        user.email.toLowerCase() === email.toLowerCase()
-    );
+    const loginDados = {
+        email: email,
+        senha: senha
+    };
 
-    // EMAIL NÃO EXISTE
-    if (!usuario) {
-        mostrarErro("erro-email", "Email não cadastrado");
-        return false;
-    }
-
-    // SENHA ERRADA
-    if (usuario.senha !== senha) {
-        mostrarErro("erro-password", "Senha incorreta");
-        return false;
-    }
-
-    // SUCESSO
-    localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
-    window.location.href = "pagina_principal.html";
+    fetch("http://localhost:8080/auth/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(loginDados)
+    })
+    .then(async (resposta) => {
+        if (resposta.ok) {
+            const usuarioLogado = await resposta.json();
+            localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado)); 
+            window.location.href = "pagina_principal.html";
+        } else {
+            mostrarErro("erro-password", "E-mail ou senha incorretos");
+        }
+    })
+    .catch(erro => {
+        console.error("Erro na requisição:", erro);
+        alert("Erro de conexão. O backend Java está rodando?");
+    });
 
     return false;
 }
