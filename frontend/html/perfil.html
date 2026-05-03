@@ -26,5 +26,137 @@
         </nav>        
     </header>
 
+    <div class="username" id="user">[Username]</div>
+
+    <div class="card-user">
+        <div class="bloco">
+            <span class="label">Última atualização</span>
+            <span class="valor-verde" id="data">--/--/----</span>
+            <button class="btn">Atualizar dados</button>
+        </div>
+
+        <div class="bloco">
+            <span class="label">Idade</span>
+            <span class="valor" id="idade">--</span>
+            <span></span>
+        </div>
+
+        <div class="bloco">
+            <span class="label">Altura</span>
+            <span class="valor" id="altura">--</span>
+            <span class="sub">(m)</span>
+        </div>
+
+        <div class="bloco">
+            <span class="label">Peso atual</span>
+            <span class="valor" id="peso">--</span>
+            <span class="sub">(kg)</span>
+        </div>
+
+        <div class="bloco medidas">
+            <span class="label">Medidas Corporais</span>
+
+            <div class="grid-medidas">
+                <div><span>Quadril:</span> <b id="quadril">--</b></div>
+                <div><span>Peito:</span> <b id="peito">--</b></div>
+                <div><span>Coxa:</span> <b id="coxa">--</b></div>
+
+                <div><span>Cintura:</span> <b id="cintura">--</b></div>
+                <div><span>Braço:</span> <b id="braco">--</b></div>
+                <div><span>Panturrilha:</span> <b id="panturrilha">--</b></div>
+            </div>
+            <span class="sub-medidas">(cm)</span>
+        </div>
+    </div>
+
+    <div class="evolucao">
+        <div class="ev-peso">
+            <h3>Evolução Peso Corporal</h3>
+            <div class="card-peso">
+                <canvas id="graficoPeso"></canvas>
+            </div>
+        </div>        
+
+        <div class="ev-carga">
+            <h3>Evolução Carga</h3>
+            <div class="card-carga">
+                <span class="titulo-destaques">DESTAQUES</span>
+
+                <div id="destaques">
+                    <div id="coluna1"></div>
+                    <div id="coluna2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="historico">
+        <div class="hist">
+            <h3>Histórico de Treinos</h3>
+            <div class="table-hist"></div>
+        </div>        
+    </div>
+
+
+    <div id="modal-atualizar" class="modal hidden">
+        <div class="modal-content">
+            <h3>Atualizar dados</h3>
+            <div class="row">
+                <div class="campo">
+                    <label>Idade</label>
+                    <input id="idade-card" class="inp">
+                </div>
+                <div class="campo">
+                    <label>Altura</label>
+                    <input id="altura-card" class="inp">
+                </div>
+                <div class="campo">
+                    <label>Peso</label>
+                    <input id="peso-card" class="inp">
+                </div>                
+            </div>
+            <br>
+            <label class="medidas-corp">Medidas Corporais</label>
+
+            <div class="row">
+                <div class="campo">
+                    <label>Quadril</label>
+                    <input id="quadril-card" class="inp">
+                </div>
+                <div class="campo">
+                    <label>Peito</label>
+                    <input id="peito-card" class="inp">
+                </div>
+            
+                <div class="campo">
+                    <label>Coxa</label>
+                    <input id="coxa-card" class="inp">
+                </div>
+            </div>
+            <div class="row">
+                <div class="campo">
+                    <label>Cintura</label>
+                    <input id="cintura-card" class="inp">
+                </div>
+                <div class="campo">
+                    <label>Braço</label>
+                    <input id="braco-card" class="inp">
+                </div>
+                <div class="campo">
+                    <label>Panturrilha</label>
+                    <input id="panturrilha-card" class="inp">
+                </div>
+            </div>            
+            
+            <div class="modal-actions">
+                <button id="cancelar">Cancelar</button>
+                <button id="salvar">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../js/global.js"></script>
+<script src="../js/perfil.js"></script>
 </body>
 </html>
