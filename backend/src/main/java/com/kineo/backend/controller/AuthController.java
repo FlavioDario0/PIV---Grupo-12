@@ -5,6 +5,7 @@ import com.kineo.backend.entity.User;
 import com.kineo.backend.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.kineo.backend.dto.LoginRequest;
 
 @RestController
 @RequestMapping("/auth")
@@ -21,5 +22,15 @@ public class AuthController {
     public ResponseEntity<User> register(@RequestBody RegisterRequest request) {
         User user = authService.register(request);
         return ResponseEntity.ok(user);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            User user = authService.login(request);
+            return ResponseEntity.ok(user);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("E-mail ou senha incorretos");
+        }
     }
 }

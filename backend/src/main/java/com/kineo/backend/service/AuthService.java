@@ -1,5 +1,6 @@
 package com.kineo.backend.service;
 
+import com.kineo.backend.dto.LoginRequest;
 import com.kineo.backend.dto.RegisterRequest;
 import com.kineo.backend.entity.User;
 import com.kineo.backend.repository.UserRepository;
@@ -28,5 +29,16 @@ public class AuthService {
         user.setFrequenciaTreinos(request.getFrequenciaTreinos());
 
         return userRepository.save(user);
+    }
+
+    public User login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("E-mail não cadastrado"));
+
+        if (!user.getSenha().equals(request.getSenha())) {
+            throw new RuntimeException("Senha incorreta");
+        }
+
+        return user;
     }
 }
