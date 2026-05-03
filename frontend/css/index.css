@@ -1,0 +1,105 @@
+html, body {
+    background: linear-gradient(45deg, #373737, #000000);
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content h1 {
+    font-family: "Baloo Thambi 2", sans-serif;
+    font-size: 50px;
+    color: white;
+    text-align: center;
+}
+
+.content h4 {
+    font-family: "Baloo Thambi 2", sans-serif;
+    font-weight: lighter;
+    font-size: 16px;
+    color: white;
+    flex: 1;
+    width: 100%;
+} 
+
+.content {
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.2);
+    gap: 15px;
+    width: 700px;
+    height: 140px;
+    border-radius: 10px;
+    padding: 0 30px;
+    cursor: pointer;
+    transition: background-color 0.5s ease, color 0.5s ease, transform 0.5s ease;        
+
+}
+
+.content:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color:#000000;
+    transform: scale(1.05); 
+}
+
+.statistics {
+    width: 45px;
+}
+
+.btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 700px;
+    gap: 8%;
+}
+
+.btn-primary {
+    background-color: #C36E0C;
+    color: white;
+    font-family: "Baloo Thambi 2", sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    width: 200px;
+    height: 50px;
+    transition: background-color 0.5s ease, color 0.5s ease, transform 0.5s ease;
+}
+
+.btn-primary:hover {
+    background-color: #ff8800;
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
+.btn-primary:active {
+    transform: scale(0.95); 
+}
+
+.btn-secondary {
+    background-color: white;
+    color: #C36E0C;
+    font-family: "Baloo Thambi 2", sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    width: 200px;
+    height: 50px;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #ffffff;
+    color:#ff8800;
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
+.btn-secondary:active {
+    transform: scale(0.95);
+}

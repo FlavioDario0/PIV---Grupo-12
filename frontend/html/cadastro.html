@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/cadastro.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+Thambi+2:wght@400..800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container">
+        <div class="box">
+            <img class="logo" src="../assets/icons/logo_vertical.svg">
+            <h2>TREINOS PERSONALIZADOS COM</h2>
+            <h2 class="destaque">INTELIGÊNCIA ARTIFICIAL</h2>
+        </div>
+        <form onsubmit="return validarCadastro()">
+            <div class="box">
+                <div class="content">
+                    <h1>Cadastro</h1>
+                    <hr>
+                    <div class="form">
+                        <div class="column">
+                            <h4> Nome </h4>
+                            <input type="text" name="name" id="name" placeholder="Digite seu nome">
+                            <span class="erro" id="erro-name"></span>
+
+                            <h4> Data de Nascimento </h4>
+                            <input type="text" name="data_nasc" id="data_nasc" maxlength="10" oninput="mascaraData(this)" placeholder="DD/MM/AAAA">
+                            <span class="erro" id="erro-data"></span>
+
+                            <h4> Email </h4>
+                            <input type="email" name="email" id="email" placeholder="Digite seu email">  
+                            <span class="erro" id="erro-email"></span>
+
+                            <h4> Senha </h4>        
+                            <input type="password" name="password" id="password" placeholder="Digite sua senha"> 
+                            <span class="erro" id="erro-password"></span>
+
+                        </div>
+                        <div class="column">
+                            <h4> Objetivo </h4>
+                            <select id="obj" name="obj">
+                                <option value="" disabled selected>Selecione um objetivo</option>
+                                <option value="emagrecimento">Emagrecimento</option>
+                                <option value="massa">Ganho de massa muscular</option>
+                                <option value="definicao">Definição muscular</option>
+                                <option value="condicionamento">Condicionamento físico</option>
+                                <option value="forca">Ganhar força</option>
+                                <option value="resistencia">Melhorar resistência</option>
+                            </select>
+                            <span class="erro" id="erro-obj"></span>
+
+                            <h4> Nível </h4>
+                            <select id="nivel" name="nivel">
+                                <option value="" disabled selected>Selecione um nível</option>
+                                <option value="iniciante">Iniciante</option>
+                                <option value="intermediario">Intermediário</option>
+                                <option value="avancado">Avançado</option>
+                            </select> 
+                            <span class="erro" id="erro-nivel"></span>
+
+                            <div class="alt_peso">
+                                <div class="campo">
+                                    <h4> Altura </h4>
+                                    <input type="text" name="altura" id="altura" placeholder="Altura (metros)"> 
+                                    <span class="erro" id="erro-altura"></span>
+
+                                </div>
+                                <div class="campo">
+                                <h4> Peso </h4>
+                                    <input type="text" name="peso" id="peso" placeholder="Peso (quilos)">
+                                    <span class="erro" id="erro-peso"></span>
+
+                                </div>                            
+                            </div>  
+
+                            <h4> Frequência de treinos </h4>
+                            <select id="frequencia" name="frequencia">
+                                <option value="" disabled selected>Selecione sua frequência</option>
+                                <option value="iniciante">1-2 dias por semana</option>
+                                <option value="leve">3-4 dias por semana</option>
+                                <option value="moderado">5-6 dias por semana</option>
+                                <option value="intenso">Todos os dias</option>
+                            </select>
+                            <span class="erro" id="erro-frequencia"></span>
+
+                            <br><br>
+                        </div>                
+                    </div>                 
+                </div>
+                <br><br>
+                <button type="submit" class="btn">Cadastrar</button>
+            </div> 
+        </form>       
+    </div>
+
+<script src="../js/global.js"></script>
+<script src="../js/cadastro.js"></script>
+
+</body>
+</html>
