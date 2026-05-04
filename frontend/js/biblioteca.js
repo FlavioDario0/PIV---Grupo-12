@@ -1,31 +1,34 @@
-/*
-window.onload = () => {
-    fetch("")
-    .then(response => response.json())
-    .then(data => {
-        renderizarExercicio(data);
-    });
-}
-*/
-
 let grupoSelecionado = null;
 let textoBusca = "";
+let listaCompleta = []; //preenchida pelo back
 
 window.onload = () => {
+    fetch("http://localhost:8080/api/exercises")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Erro na resposta do servidor");
+            }
+            return response.json();
+        })
+        .then(data => {
+            listaCompleta = data; // Salva os dados vindos do banco
+            aplicarFiltros();     // Renderiza na tela a primeira vez
+        })
+        .catch(error => {
+            console.error("Erro ao buscar exercícios:", error);
+            document.getElementById("lista-exercicios").innerHTML = 
+                "<p style='color: white; text-align: center;'>Erro ao carregar o catálogo de exercícios. O backend está rodando?</p>";
+        });
 
+    // 2. Configura a barra de pesquisa por texto
     const inputBusca = document.getElementById("input-busca");
-
-    inputBusca.addEventListener("input", () => {
-        console.log("digitando...");
-
-        textoBusca = inputBusca.value.toLowerCase();
-        aplicarFiltros();
-    });
-
-    aplicarFiltros();
+    if (inputBusca) {
+        inputBusca.addEventListener("input", () => {
+            textoBusca = inputBusca.value.toLowerCase();
+            aplicarFiltros();
+        });
+    }
 };
-
-
 
 function filtrarGrupo(grupo) {
     // se clicar no mesmo grupo - desativa
@@ -34,7 +37,6 @@ function filtrarGrupo(grupo) {
     } else {
         grupoSelecionado = grupo;
     }
-
     atualizarMenuAtivo(grupoSelecionado);
     aplicarFiltros();
 }
@@ -44,9 +46,8 @@ function aplicarFiltros() {
 
     if (grupoSelecionado) {
         const musculosGrupo = mapaGrupos[grupoSelecionado] || [];
-
         filtrados = filtrados.filter(e => 
-            musculosGrupo.some(m =>
+             musculosGrupo.some(m =>
                 e.musculos.principal.toLowerCase().includes(m)
             )
         );
@@ -66,28 +67,34 @@ function aplicarFiltros() {
     renderizarExercicios(filtrados);
 }
 
-
 function atualizarMenuAtivo(grupo) {
     const links = document.querySelectorAll(".filtro a");
-
     links.forEach(link => {
         link.classList.remove("ativo");
-
         if (link.dataset.grupo === grupo) {
             link.classList.add("ativo");
         }
     });
 }
 
-
 function renderizarExercicios(lista) {
     const container = document.getElementById("lista-exercicios");
-
     container.innerHTML = "";
+    
+    if (lista.length === 0) {
+        container.innerHTML = "<p style='color: white; text-align: center; margin-top: 20px;'>Nenhum exercício encontrado.</p>";
+        return;
+    }
 
     lista.forEach(exercicio => {
         const card = document.createElement("div");
         card.classList.add("container-exercicio");
+        
+        // Proteção para garantir que as arrays existam mesmo se o banco de dados retornar null
+        const imagens = exercicio.imagens || ["", ""];
+        const niveis = exercicio.niveis || [];
+        const secundarios = exercicio.musculos?.secundarios || [];
+        const erros = exercicio.erros || [];
 
         card.innerHTML = `
         <div class="card-header">
@@ -96,28 +103,25 @@ function renderizarExercicios(lista) {
         
         <div class="card-body">
             <div class="col-esquerda">
-                <img src="${exercicio.imagens[0]}">
-                <img src="${exercicio.imagens[1]}">
+                <img src="${imagens[0] || ''}" alt="Imagem 1">
+                <img src="${imagens[1] || ''}" alt="Imagem 2">
             </div>
-
             <div class="conteudo">
                 <div class="linha-cima">
                 <div class="descricao">
                     <h3> Descrição do exercício </h3>
-                    <span>${exercicio.descricao}</span>
+                    <span>${exercicio.descricao || ''}</span>
                 </div>
-
                 <div class="col-direita">
                     <div class="equip">
                         <h3> Equipamentos necessários </h3>
-                        <span>${exercicio.equipamentos}</span>
+                        <span>${exercicio.equipamentos || ''}</span>
                     </div>
                     <div class="nivel">
                         <h3> Nível de dificuldade </h3>
                         <div class="nivel-linha">
-                            <span class="nomes-niveis">${exercicio.niveis.join(" e ")}</span>
-
-                            <div class="cores-niveis">${exercicio.niveis.map(n => `
+                            <span class="nomes-niveis">${niveis.join(" e ")}</span>
+                            <div class="cores-niveis">${niveis.map(n => `
                                     <div class="classific ${normalizarTexto(n)}"></div>
                                 `).join("")}
                             </div>
@@ -125,18 +129,17 @@ function renderizarExercicios(lista) {
                     </div>
                 </div>
                 </div>
-
                 <div class="linha-baixo">
                     <div class="musculos">
-                        <h3> Músucos trabalhados </h3>
-                        <span>Principal: ${exercicio.musculos.principal}</span>
+                        <h3> Músculos trabalhados </h3>
+                        <span>Principal: ${exercicio.musculos?.principal || ''}</span>
                         <br>
                         <span> Secundários: <span>
-                        <ul>${exercicio.musculos.secundarios.map(m => `<li>${m}</li>`).join("")}</ul>
+                        <ul>${secundarios.map(m => `<li>${m}</li>`).join("")}</ul>
                     </div>
                     <div class="erro">
-                        <h3> ⚠️ Erros comuns </h3>
-                        <ul>${exercicio.erros.map(m => `<li>${m}</li>`).join("")}</ul>
+                        <h3> Erros comuns </h3>
+                        <ul>${erros.map(m => `<li>${m}</li>`).join("")}</ul>
                     </div>
                 </div>
             </div>
@@ -144,66 +147,16 @@ function renderizarExercicios(lista) {
         <br>
         <br>
         `;
-
         container.appendChild(card);
     });
 }
-
 
 function normalizarTexto(texto) {
   return texto
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+    .replace(/[\u0300-\u036f]/g, ""); 
 }
-
-
-
-// EXEMPLOS
-const exerciciosMock = [
-    {
-        nome: "Supino Reto",
-        imagens: ["../assets/img/supino1.png", "../assets/img/supino2.png"],
-        descricao: "Exercício para peitoral",
-        equipamentos: "Barra",
-        niveis: ["Iniciante", "Intermediário"],
-        musculos: {
-            principal: "peito",
-            secundarios: ["bíceps", "tríceps"]
-        },
-        erros: ["Abrir demais os cotovelos"]
-    },
-    {
-        nome: "Agachamento",
-        imagens: ["../assets/img/agacho1.png", "../assets/img/agacho2.png"],
-        descricao: "Exercício para pernas",
-        equipamentos: "Barra",
-        niveis: ["Iniciante"],
-        musculos: {
-            principal: "quadríceps",
-            secundarios: ["glúteo", "posterior de coxa"]
-        },
-        erros: ["Não curvar a coluna", "Não afastar as pernas"]
-    },
-    {
-        nome: "Pulley Articulado",
-        imagens: ["../assets/img/agacho1.png", "../assets/img/agacho2.png"],
-        descricao: "Sente-se no equipamento com a postura ereta, pés apoiados e joelhos levemente fixados (se houver apoio). Segure as alças do pulley com os braços estendidos à frente ou acima (dependendo do modelo)."+
-                    "Puxe as alças em direção ao tronco, flexionando os cotovelos e contraindo as costas."+
-                    "\nRetorne lentamente à posição inicial, controlando o movimento.",
-        equipamentos: "Máquina de pulley articulado (com braços independentes) e ajuste de carga por pesos (placas ou pinos)",
-        niveis: ["Avançado"],
-        musculos: {
-            principal: "dorsal (costas)",
-            secundarios: ["bíceps", "trapézio", "romboides", "deltoide posterior"]
-        },
-        erros: ["Curvar as costas durante o movimento", "Usar impulso do corpo ao invés de força muscular", "Puxar com os braços e não com as costas",
-            "Não controlar a volta (fase excêntrica muito rápida)","Amplitude incompleta (não estender ou não puxar totalmente)"
-        ]
-    }
-];
-
-let listaCompleta = exerciciosMock;
 
 const mapaGrupos = {
     peito: ["peito"],
