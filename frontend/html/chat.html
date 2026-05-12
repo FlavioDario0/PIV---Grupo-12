@@ -26,5 +26,67 @@
         </nav>        
     </header>
 
+    <div class="container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+
+            <button class="novo-chat">
+                <img src="../assets/icons/new_chat.svg">
+                Novo chat
+            </button>
+
+            <div class="chat-lista">
+                <p>Chats</p>
+
+                <div class="linha"></div>
+
+                <div id="historico"></div>
+            </div>
+
+        </aside>
+
+
+        <!-- Conteúdo principal -->
+        <div class="main">
+
+            <h1>Chat</h1>
+            <h2>Olá! Em que posso ajudar?</h2>
+
+            <div class="chat-central">
+
+                <div id="chat-mensagens"></div>
+
+                <div class="input-area">
+
+                    <textarea id="msg" rows="1" placeholder="Pergunte ao Chat"></textarea>
+
+                    <button id="enviar">
+                        <img src="../assets/icons/send.svg">
+                    </button>
+
+                </div>
+
+                <div class="acoes">
+
+                    <button id="treino-btn">
+                        Gerar treino personalizado
+                    </button>
+
+                    <button id="substituir-btn">
+                        Substituir exercício
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+<script src="../js/global.js"></script>
+<script src="../js/chat.js"></script>
+
 </body>
 </html>
