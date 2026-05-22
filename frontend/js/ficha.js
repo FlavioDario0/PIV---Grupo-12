@@ -1,45 +1,54 @@
-/*fetch("")
-    .then(response => response.json())
-    .then(data => {
-        renderTela(data);
-    })
-    .catch(error => console.error("Erro:", error));
-*/
+const usuarioLogado = protegerPagina();
 
 let cardEditando = null;
 let cardParaExcluir = null;
+let treinoAtual = null;
+let totalConcluidos = 0;
+
+const modal = document.getElementById("modal-obs");
+const btnAbrir = document.querySelector(".btn");
+const btnCancelar = document.getElementById("cancelar");
+const btnSalvar = document.getElementById("salvar");
+const inputObs = document.getElementById("input-obs");
+const sidebar = document.querySelector(".sidebar");
+const modalDelete = document.getElementById("modal-delete");
+const btnCancelarDelete = document.getElementById("cancelar-delete");
+const btnConfirmarDelete = document.getElementById("confirmar-delete");
+const btnFinalizar = document.querySelector(".finish");
 
 function renderTela(data) {
     const tableBody = document.getElementById("table-body");
-
-    const progressBar = document.getElementById("progress"); 
-
+    const progressBar = document.getElementById("progress");
     const countAtual = document.getElementById("count-atual");
     const countTotal = document.getElementById("count-total");
-
     const totalExercicios = data.exercicios.length;
 
-    countAtual.textContent = 0;
+    tableBody.innerHTML = "";
+    totalConcluidos = 0;
+    countAtual.textContent = "0";
     countTotal.textContent = totalExercicios;
-
-    let total = 0;
-
-    // título
+    progressBar.style.width = "0%";
     document.querySelector("h2").textContent = `Treino do Dia: ${data.treino}`;
 
-    // exercícios
+    document.querySelectorAll(".card-ia").forEach(card => card.remove());
+
+    if (totalExercicios === 0) {
+        tableBody.innerHTML = `<div class="row"><span>Nenhum exercicio cadastrado para este treino.</span></div>`;
+        return;
+    }
+
     data.exercicios.forEach(ex => {
         const row = document.createElement("div");
         row.classList.add("row");
 
         row.innerHTML = `
-            <span>${ex.nome}</span>
-            <span>${ex.serie}</span>
-            <span>${ex.repeticoes}</span>
-            <span>${ex.carga}</span>
+            <span>${escapeHtml(ex.nome)}</span>
+            <span>${escapeHtml(ex.serie)}</span>
+            <span>${escapeHtml(ex.repeticoes)}</span>
+            <span>${escapeHtml(ex.carga)}</span>
             <div class="concluido">
                 <button class="check"></button>
-                <span>Concluído<span>
+                <span>Concluido</span>
             </div>
         `;
 
@@ -48,78 +57,27 @@ function renderTela(data) {
         btn.addEventListener("click", () => {
             btn.classList.toggle("done");
 
-            if (btn.classList.contains("done")) {
-                total++;
-            } else {
-                total--;
-            }
+            totalConcluidos += btn.classList.contains("done") ? 1 : -1;
+            countAtual.textContent = totalConcluidos;
 
-            countAtual.textContent = total;
-
-            const porcentagem = (total / totalExercicios) * 100;
+            const porcentagem = (totalConcluidos / totalExercicios) * 100;
             progressBar.style.width = porcentagem + "%";
         });
 
         tableBody.appendChild(row);
     });
 
-    const sidebar = document.querySelector(".sidebar");
-
     if (data.insight) {
         const card = document.createElement("div");
         card.classList.add("card-ia");
-
         card.innerHTML = `
             <h3>IA Insights</h3>
-            <p>${data.insight}</p>
+            <p>${escapeHtml(data.insight)}</p>
         `;
 
         sidebar.prepend(card);
     }
-
-    btnAbrir.addEventListener("click", () => {
-        modal.classList.remove("hidden");
-        inputObs.value = "";
-        cardEditando = null; 
-    });
-
-    btnSalvar.addEventListener("click", () => {
-        const texto = inputObs.value.trim();
-        if (texto === "") return;
-
-        if (cardEditando) {
-            const textoObs = cardEditando.querySelector(".texto-obs");
-            textoObs.textContent = texto;
-
-            cardEditando = null;
-        } 
-        else {
-            const card = document.createElement("div");
-            card.classList.add("card-obs");
-
-            card.innerHTML = `
-                <h3>Observação</h3>
-                <p class="texto-obs">${texto}</p>
-
-                <div class="acoes-obs">
-                    <button class="editar">
-                        <img src="../assets/icons/edit.svg">
-                    </button>
-                    <button class="excluir">
-                        <img src="../assets/icons/delete.svg">
-                    </button>
-                </div>
-            `;
-
-            adicionarEventosCard(card); 
-            sidebar.appendChild(card);
-        }
-
-        modal.classList.add("hidden");
-        inputObs.value = "";
-    });
 }
-
 
 function adicionarEventosCard(card) {
     const btnExcluir = card.querySelector(".excluir");
@@ -134,12 +92,9 @@ function adicionarEventosCard(card) {
     btnEditar.addEventListener("click", () => {
         modal.classList.remove("hidden");
         inputObs.value = textoObs.textContent;
-
-        cardEditando = card; 
+        cardEditando = card;
     });
 }
-
-
 
 function ativarGrupo(selector) {
     const botoes = document.querySelectorAll(selector);
@@ -152,21 +107,75 @@ function ativarGrupo(selector) {
     });
 }
 
+function mapearTreinoBackend(workout) {
+    return {
+        treino: workout.titulo || "Treino",
+        exercicios: (workout.exercicios || []).map(ex => ({
+            nome: ex.nomeExercicio || "-",
+            serie: ex.series ? `${ex.series}x` : "-",
+            repeticoes: ex.repeticoes || "-",
+            carga: "-",
+            observacoes: ex.observacoes || "",
+            diaSemana: ex.diaSemana || ""
+        }))
+    };
+}
+
+async function carregarTreino() {
+    if (!usuarioLogado) {
+        return;
+    }
+
+    try {
+        const workouts = await apiFetch(`/workouts/user/${usuarioLogado.id}`);
+
+        if (!workouts.length) {
+            treinoAtual = {
+                treino: "Nenhum treino cadastrado",
+                exercicios: []
+            };
+        } else {
+            treinoAtual = mapearTreinoBackend(workouts[0]);
+        }
+
+        renderTela(treinoAtual);
+    } catch (erro) {
+        treinoAtual = {
+            treino: "Erro ao carregar treino",
+            exercicios: []
+        };
+        renderTela(treinoAtual);
+        console.error(erro);
+    }
+}
+
+async function concluirTreino() {
+    if (!usuarioLogado) {
+        return;
+    }
+
+    try {
+        await apiFetch("/streaks/today", {
+            method: "POST",
+            body: {
+                userId: usuarioLogado.id,
+                treinou: true
+            }
+        });
+
+        alert("Treino concluido e streak atualizado!");
+    } catch (erro) {
+        alert(erro.message || "Nao foi possivel concluir o treino.");
+    }
+}
+
 ativarGrupo(".dias button");
 ativarGrupo(".treinos button");
 
-
-
-// MODAL OBSERVAÇÃO
-const modal = document.getElementById("modal-obs");
-const btnAbrir = document.querySelector(".btn");
-const btnCancelar = document.getElementById("cancelar");
-const btnSalvar = document.getElementById("salvar");
-const inputObs = document.getElementById("input-obs");
-const sidebar = document.querySelector(".sidebar");
-
 btnAbrir.addEventListener("click", () => {
     modal.classList.remove("hidden");
+    inputObs.value = "";
+    cardEditando = null;
 });
 
 btnCancelar.addEventListener("click", () => {
@@ -174,11 +183,40 @@ btnCancelar.addEventListener("click", () => {
     inputObs.value = "";
 });
 
+btnSalvar.addEventListener("click", () => {
+    const texto = inputObs.value.trim();
+    if (texto === "") {
+        return;
+    }
 
-// MODAL EXCLUIR
-const modalDelete = document.getElementById("modal-delete");
-const btnCancelarDelete = document.getElementById("cancelar-delete");
-const btnConfirmarDelete = document.getElementById("confirmar-delete");
+    if (cardEditando) {
+        const textoObs = cardEditando.querySelector(".texto-obs");
+        textoObs.textContent = texto;
+        cardEditando = null;
+    } else {
+        const card = document.createElement("div");
+        card.classList.add("card-obs");
+
+        card.innerHTML = `
+            <h3>Observacao</h3>
+            <p class="texto-obs">${escapeHtml(texto)}</p>
+            <div class="acoes-obs">
+                <button class="editar">
+                    <img src="../assets/icons/edit.svg">
+                </button>
+                <button class="excluir">
+                    <img src="../assets/icons/delete.svg">
+                </button>
+            </div>
+        `;
+
+        adicionarEventosCard(card);
+        sidebar.appendChild(card);
+    }
+
+    modal.classList.add("hidden");
+    inputObs.value = "";
+});
 
 btnCancelarDelete.addEventListener("click", () => {
     modalDelete.classList.add("hidden");
@@ -194,26 +232,6 @@ btnConfirmarDelete.addEventListener("click", () => {
     cardParaExcluir = null;
 });
 
+btnFinalizar.addEventListener("click", concluirTreino);
 
-
-// EXEMPLO
-function getTreinoExemplo() {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve({
-                treino: "Superiores B",
-                exercicios: [
-                    { nome: "Supino Reto", serie: "3x", repeticoes: "10-12", carga: "20kg" },
-                    { nome: "Supino Inclinado", serie: "3x", repeticoes: "10-12", carga: "20kg" },
-                    { nome: "Rosca Direta", serie: "3x", repeticoes: "10-12", carga: "15kg" }
-                ],
-                insight: "Tente aumentar 1kg no Supino Reto",
-                observacao: "Treino pesado e completo!"
-            });
-        }, 200); 
-    });
-}
-
-getTreinoExemplo().then(data => {
-    renderTela(data);
-});
+carregarTreino();

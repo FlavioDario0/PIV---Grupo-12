@@ -1,13 +1,6 @@
-/*
-window.onload = () => {
-    fetch("")
-    .then(response => response.json())
-    .then(data => {
-        renderizarExercicio(data);
-    });
-}
-*/
+protegerPagina();
 
+// Ainda nao existe endpoint de biblioteca no backend; por enquanto a tela usa mock local.
 let grupoSelecionado = null;
 let textoBusca = "";
 
