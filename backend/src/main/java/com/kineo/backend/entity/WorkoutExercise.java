@@ -21,6 +21,7 @@ public class WorkoutExercise {
     private Integer repeticoes;
     private Integer descansoSegundos;
     private String observacoes;
+    private Double cargaRecomendada;
 
     @ManyToOne
     @JoinColumn(name = "workout_plan_id")

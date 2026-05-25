@@ -15,6 +15,7 @@ public class WorkoutExerciseResponse {
     private Integer repeticoes;
     private Integer descansoSegundos;
     private String observacoes;
+    private Double cargaRecomendada;
 
     public static WorkoutExerciseResponse fromEntity(WorkoutExercise exercise) {
         return new WorkoutExerciseResponse(
@@ -25,7 +26,8 @@ public class WorkoutExerciseResponse {
                 exercise.getSeries(),
                 exercise.getRepeticoes(),
                 exercise.getDescansoSegundos(),
-                exercise.getObservacoes()
+                exercise.getObservacoes(),
+                exercise.getCargaRecomendada()
         );
     }
 }
