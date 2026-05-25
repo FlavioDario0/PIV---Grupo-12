@@ -8,8 +8,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+Thambi+2:wght@400..800&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -20,16 +18,24 @@
         <nav class="menu">
             <a href="pagina_principal.html">Home</a>
             <a href="biblioteca.html">Biblioteca de Exercícios</a>
-            <a href="ficha.html"  class="ativo">Ficha de Treinos</a>
+            <a href="ficha.html" class="ativo">Ficha de Treinos</a>
             <a href="chat.html">Chat com IA</a>
             <a href="perfil.html">Perfil</a>
-        </nav>        
+        </nav>
     </header>
+
+    <div id="empty-state" class="hidden">
+        <h2>Crie sua ficha de treino com Kineo e acompanhe em tempo real sua evolução!</h2>
+        <button id="btn-criar-ficha">Criar Ficha</button>
+    </div>
 
     <div class="container">
         <div class="top-controls">
 
-            <h2>Treino do Dia:  </h2>
+            <div class="titulo-treino">
+                <h2>Treino do Dia</h2>
+                <span class="subtitulo-dia" id="subtitulo-dia">Selecione um dia</span>
+            </div>
 
             <div class="dias">
                 <button>Seg</button>
@@ -41,11 +47,6 @@
                 <button>Dom</button>
             </div>
 
-            <div class="treinos">
-                <button>A</button>
-                <button class="ativo">B</button>
-                <button>C</button>
-            </div>
 
         </div>
 
@@ -57,45 +58,41 @@
                     <span>Repetições</span>
                     <span>Carga</span>
                     <span>Status</span>
-                
                 </div>
 
                 <div id="table-body"></div>
-                            
             </div>
 
             <aside class="sidebar">
-                
-                <button class="btn"> Adicionar Observação </button>
-
+                <button class="btn">Adicionar Observação</button>
             </aside>
         </div>
 
-        <div class="footer">
+        <div class="footer" id="footer-treino">
             <div class="status">
                 <div class="content-status">
-                    <h3>Status de Conclusão da Semana</h3>
-                    <h3>
-                        Treinos Concluídos: 
-                        <span id="count-atual">0</span>/<span id="count-total">0</span>
-                    </h3>
+                    <span class="label-progresso">Progressão Diária</span>
+                    <span class="count-progresso">
+                        <span id="count-atual">0</span>
+                        <span class="separador">/</span>
+                        <span id="count-total">0</span>
+                        <span class="label-exercicios">exercícios</span>
+                    </span>
                 </div>
-                
+
                 <div class="progress-bar">
                     <div id="progress"></div>
                 </div>
             </div>
-                
+
             <button class="finish">Concluir Treino</button>
         </div>
-
     </div>
 
     <div id="modal-obs" class="modal hidden">
         <div class="modal-content">
             <h3>Observações do treino</h3>
             <textarea id="input-obs" placeholder="Escreva sua observação..."></textarea>
-            
             <div class="modal-actions">
                 <button id="cancelar">Cancelar</button>
                 <button id="salvar">Salvar</button>
@@ -107,7 +104,6 @@
         <div class="modal-content">
             <h3>Excluir observação?</h3>
             <p>Essa ação não pode ser desfeita.</p>
-
             <div class="modal-actions">
                 <button id="cancelar-delete">Cancelar</button>
                 <button id="confirmar-delete">Excluir</button>
@@ -115,7 +111,7 @@
         </div>
     </div>
 
-<script src="../js/global.js"></script>
-<script src="../js/ficha.js"></script>
+    <script src="../js/global.js"></script>
+    <script src="../js/ficha.js"></script>
 </body>
 </html>
