@@ -92,7 +92,7 @@ public class AiController {
             String promptJSON = String.format(
                     "Gere a divisão de treino para nível %s, objetivo %s, %s dias. " +
                             "Responda APENAS com este JSON exato: " +
-                            "{ \"titulo\": \"Ficha\", \"treinos\": [ { \"diaSemana\": \"Treino A\", \"musculosAlvo\": [\"peito\", \"triceps\"] } ] } " +
+                            "{ \"titulo\": \"Ficha\", \"treinos\": [ { \"diaSemana\": \"segunda\", \"musculosAlvo\": [\"peito\", \"triceps\"] } ] } " +
                             "NÃO adicione introduções, NÃO use markdown, NÃO escreva observações longas.",
                     nivel, objetivo, diasPorSemana
             );
