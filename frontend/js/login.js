@@ -1,4 +1,6 @@
-function login() {
+async function login() {
+
+    event.preventDefault(); 
     
     limparErros();
 
@@ -7,13 +9,11 @@ function login() {
 
     let valido = true;
 
-    // EMAIL
     if (!email) {
         mostrarErro("erro-email", "Digite seu email");
         valido = false;
     }
 
-    // SENHA
     if (!senha) {
         mostrarErro("erro-password", "Digite sua senha");
         valido = false;
@@ -21,31 +21,52 @@ function login() {
 
     if (!valido) return false;
 
-    let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+    const btnLogin = document.querySelector("button[type='submit']") || document.querySelector("button");
+    const textoOriginal = btnLogin.textContent;
+    btnLogin.textContent = "Entrando...";
+    btnLogin.disabled = true;
 
-    const usuario = usuarios.find(user => 
-        user.email.toLowerCase() === email.toLowerCase()
-    );
+    try {
+        const response = await fetch("http://localhost:8080/auth/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            
+            body: JSON.stringify({
+                email: email,
+                senha: senha 
+            })
+        });
 
-    // EMAIL NÃO EXISTE
-    if (!usuario) {
-        mostrarErro("erro-email", "Email não cadastrado");
-        return false;
+        if (response.ok) {
+        
+            const dadosUsuario = await response.json();
+
+        
+            localStorage.setItem("usuarioLogado", JSON.stringify(dadosUsuario));
+            
+            // Redireciona para a página principal
+            window.location.href = "pagina_principal.html";
+        } else {
+            
+            if (response.status === 401 || response.status === 403) {
+                mostrarErro("erro-password", "Email ou senha incorretos");
+            } else {
+                mostrarErro("erro-email", "Erro ao fazer login. Verifique seus dados.");
+            }
+        }
+    } catch (error) {
+        console.error("Erro na requisição:", error);
+        mostrarErro("erro-email", "Erro de conexão com o servidor. O backend está rodando?");
+    } finally {
+        // Restaura o botão
+        btnLogin.textContent = textoOriginal;
+        btnLogin.disabled = false;
     }
-
-    // SENHA ERRADA
-    if (usuario.senha !== senha) {
-        mostrarErro("erro-password", "Senha incorreta");
-        return false;
-    }
-
-    // SUCESSO
-    localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
-    window.location.href = "pagina_principal.html";
 
     return false;
 }
 
-
-document.getElementById("email").addEventListener("input", () => {mostrarErro("erro-email", "");});
-document.getElementById("password").addEventListener("input", () => {mostrarErro("erro-password", "");});
+document.getElementById("email").addEventListener("input", () => { mostrarErro("erro-email", ""); });
+document.getElementById("password").addEventListener("input", () => { mostrarErro("erro-password", ""); });

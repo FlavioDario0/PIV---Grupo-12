@@ -202,20 +202,27 @@ window.onload = async () => {
     const containerFicha = document.querySelector(".container");
     const emptyState = document.getElementById("empty-state");
     const idDoUsuario = usuario.id || usuario.userId || usuario.idUsuario;
+    const token = usuario.token; // <-- PEGA O TOKEN DO USUÁRIO
 
-    
     const labelProgressao = document.querySelector(".progresso label, .progress-label, .label-progresso");
     if (labelProgressao) labelProgressao.textContent = "Progressão Diária";
 
     try {
-        const response = await fetch(`http://localhost:8080/workouts/user/${idDoUsuario}`);
+        // MANDA O TOKEN NO CABEÇALHO (HEADER) DA REQUISIÇÃO
+        const response = await fetch(`http://localhost:8080/workouts/user/${idDoUsuario}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` // <-- AUTORIZAÇÃO AQUI
+            }
+        });
         
         if (response.ok) {
             const dadosDoBanco = await response.json();
             
-            
             if (Array.isArray(dadosDoBanco) && dadosDoBanco.length > 0) {
-                if (dadosDoBanco[0].exercicios) {
+                // Pega a ficha mais recente
+                if (dadosDoBanco[dadosDoBanco.length - 1].exercicios) {
                     treinoCompleto = dadosDoBanco[dadosDoBanco.length - 1].exercicios || [];
                 } else {
                     treinoCompleto = dadosDoBanco;
@@ -227,13 +234,13 @@ window.onload = async () => {
             }
         } else {
             treinoCompleto = [];
+            console.error("Erro ao buscar fichas. Status:", response.status);
         }
     } catch (error) {
-        console.error("Erro ao buscar ficha:", error);
+        console.error("Erro de conexão ao buscar ficha:", error);
         treinoCompleto = [];
     }
 
-    
     if (!treinoCompleto || treinoCompleto.length === 0) {
         containerFicha.classList.add("hidden");
         emptyState.classList.remove("hidden");
@@ -241,13 +248,8 @@ window.onload = async () => {
         containerFicha.classList.remove("hidden");
         emptyState.classList.add("hidden");
         
-        
         configurarBotoesDias();
-        
-        
         criarBarraSemanal();
-        
-        
         renderTela(diaSelecionado);
     }
 };
@@ -306,7 +308,6 @@ function renderTela(dia) {
         return;
     }
 
-    // Dia com treino → mostra footer normalmente
     if (footer) footer.style.display = "";
     if (finishBtn) finishBtn.style.display = "";
     countAtual.textContent = 0;
@@ -355,6 +356,7 @@ document.getElementById("btn-criar-ficha").addEventListener("click", async () =>
     const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
     const btn = document.getElementById("btn-criar-ficha");
     const idDoUsuario = usuario.id || usuario.userId || usuario.idUsuario;
+    const token = usuario.token;
 
     if (!idDoUsuario) {
         alert("Erro grave: O ID do usuário não foi encontrado. Por favor, faça login novamente.");
@@ -376,7 +378,10 @@ document.getElementById("btn-criar-ficha").addEventListener("click", async () =>
     try {
         const response = await fetch("http://localhost:8080/chat/gerar-treino", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` 
+            },
             body: JSON.stringify(payload)
         });
 
@@ -404,7 +409,6 @@ document.getElementById("btn-criar-ficha").addEventListener("click", async () =>
     }
 });
 
-
 document.querySelector(".finish").addEventListener("click", async () => {
     const botaoFinalizar = document.querySelector(".finish");
 
@@ -421,21 +425,19 @@ document.querySelector(".finish").addEventListener("click", async () => {
         
         const usuario = JSON.parse(usuarioStorage);
         const idDoUsuario = usuario.id || usuario.userId || usuario.idUsuario;
+        const token = usuario.token;
 
-        
         botaoFinalizar.textContent = "Processando IA...";
         botaoFinalizar.style.pointerEvents = "none";
 
         const promessasDeReq = [];
         const nomesExerciciosFeitos = [];
 
-        
         botoesCheck.forEach(btn => {
             const row = btn.closest(".row");
             if (!row) return; 
 
             const workoutExerciseId = btn.getAttribute("data-id");
-            
             const inputCarga = row.querySelector(".input-carga");
             const inputReps = row.querySelector(".input-reps");
             const spanNome = row.querySelector("span");
@@ -446,7 +448,10 @@ document.querySelector(".finish").addEventListener("click", async () => {
 
             const requisicao = fetch("http://localhost:8080/treino/finalizar-exercicio", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}` // <-- AUTORIZAÇÃO AQUI
+                },
                 body: JSON.stringify({
                     userId: idDoUsuario,
                     workoutExerciseId: parseInt(workoutExerciseId),
@@ -462,9 +467,7 @@ document.querySelector(".finish").addEventListener("click", async () => {
             promessasDeReq.push(requisicao);
         });
 
-        console.log("A aguardar respostas do Java/IA...");
-        const respostasIA = await Promise.all(promessasDeReq);
-        console.log("Respostas recebidas:", respostasIA);
+        await Promise.all(promessasDeReq);
 
         marcarDiaConcluido(diaSelecionado);
         atualizarBarraSemanal();
@@ -472,7 +475,7 @@ document.querySelector(".finish").addEventListener("click", async () => {
 
     } catch (error) {
         console.error("Erro CRÍTICO:", error);
-        alert(`Ocorreu um erro: ${error.message}\nVerifique o console (F12) para mais detalhes.`);
+        alert(`Ocorreu um erro: ${error.message}`);
     } finally {
         if (botaoFinalizar) {
             botaoFinalizar.textContent = "Concluir Treino";
