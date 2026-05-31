@@ -3,3 +3,4 @@ node_modules
 escopo.md
 memory.md
 .gitignore
+.idea/
