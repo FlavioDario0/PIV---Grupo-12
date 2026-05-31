@@ -113,4 +113,21 @@ public class WorkoutLogController {
             return ResponseEntity.internalServerError().body(Map.of("erro", "Falha ao registar treino: " + e.getMessage()));
         }
     }
+    @GetMapping("/historico/{userId}")
+    public ResponseEntity<?> getHistoricoUsuario(@PathVariable Long userId) {
+        List<WorkoutLog> logs = workoutLogRepository.findByUserIdOrderByDataTreinoDesc(userId);
+
+        List<Map<String, Object>> response = logs.stream().map(log -> {
+            Map<String, Object> map = new java.util.HashMap<>();
+            map.put("data", log.getDataTreino() != null ? log.getDataTreino().toString() : "");
+            map.put("nomeExercicio", log.getWorkoutExercise() != null ? log.getWorkoutExercise().getNomeExercicio() : "Exercício");
+            map.put("cargaUsada", log.getCargaUsada());
+            map.put("repeticoesFeitas", log.getRepeticoesFeitas());
+            map.put("metaSeries", log.getWorkoutExercise() != null ? log.getWorkoutExercise().getSeries() : 0);
+            map.put("metaReps", log.getWorkoutExercise() != null ? log.getWorkoutExercise().getRepeticoes() : 0);
+            return map;
+        }).collect(java.util.stream.Collectors.toList());
+
+        return ResponseEntity.ok(response);
+    }
 }

@@ -1,6 +1,5 @@
 package com.kineo.backend.controller;
 
-import com.kineo.backend.dto.StreakRequest;
 import com.kineo.backend.dto.StreakResponse;
 import com.kineo.backend.dto.StreakSummaryResponse;
 import com.kineo.backend.service.StreakService;
@@ -18,11 +17,6 @@ public class StreakController {
 
     public StreakController(StreakService streakService) {
         this.streakService = streakService;
-    }
-
-    @PostMapping("/today")
-    public ResponseEntity<StreakResponse> marcarHoje(@RequestBody StreakRequest request) {
-        return ResponseEntity.ok(streakService.marcarHoje(request));
     }
 
     @GetMapping("/user/{userId}")
