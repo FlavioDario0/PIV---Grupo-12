@@ -85,16 +85,17 @@ public class AiController {
 
             Long userId = Long.valueOf(request.get("userId").toString());
             String objetivo = request.getOrDefault("objetivo", "Hipertrofia").toString();
-            String diasPorSemana = request.getOrDefault("dias", "4").toString();
             String nivel = request.getOrDefault("nivel", "Intermediário").toString();
-
+            String frequenciaTreinos = request.getOrDefault("frequenciaTreinos", "4 dias por semana").toString();
 
             String promptJSON = String.format(
-                    "Gere a divisão de treino para nível %s, objetivo %s, %s dias. " +
-                            "Responda APENAS com este JSON exato: " +
-                            "{ \"titulo\": \"Ficha\", \"treinos\": [ { \"diaSemana\": \"segunda\", \"musculosAlvo\": [\"peito\", \"triceps\"] } ] } " +
-                            "NÃO adicione introduções, NÃO use markdown, NÃO escreva observações longas.",
-                    nivel, objetivo, diasPorSemana
+                    "Aja como um Personal Trainer de elite. Crie uma divisão de treino semanal para o nível %s e objetivo %s. " +
+                            "REGRA ABSOLUTA: O utilizador quer essa frequencia EXATA de dias: %s. " +
+                            "A lista 'treinos' no seu JSON DEVE ter EXATAMENTE esse número de elementos (um para cada dia de treino). Nem mais, nem menos. " +
+                            "Se ele treina 5 dias, crie 5 objetos de dia. Se treina 2 dias, crie 2 objetos de dia. " +
+                            "Responda APENAS com a estrutura JSON válida abaixo e NADA MAIS. " +
+                            "{ \"titulo\": \"Ficha\", \"treinos\": [ { \"diaSemana\": \"segunda\", \"musculosAlvo\": [\"peito\", \"triceps\"] } ] } ",
+                    nivel, objetivo, frequenciaTreinos
             );
 
             String respostaOllama = aiService.perguntarAoOllama(promptJSON, true);
