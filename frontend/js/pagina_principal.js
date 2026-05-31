@@ -1,160 +1,220 @@
-// ==========================================
-// MOCK DE DADOS (Simulando o Banco de Dados/Backend)
-// ==========================================
-const mockData = {
-    streak: {
-        current: 30, // Dias seguidos
-        days: [
-            { name: 'Seg', status: 'descanso' },
-            { name: 'Ter', status: 'treinou' },
-            { name: 'Qua', status: 'descanso' },
-            { name: 'Qui', status: 'treinou' },
-            { name: 'Sex', status: 'descanso' },
-            { name: 'Sáb', status: 'descanso' },
-            { name: 'Dom', status: 'descanso' }
-        ]
-    },
-    treinoDoDia: [
-        { nome: 'Supino Reto', series_reps: '3x12' },
-        { nome: 'Supino<br>Inclinado', series_reps: '3x10' },
-        { nome: 'Rosca Direta', series_reps: '3x10' },
-        { nome: 'Elevação<br>Lateral', series_reps: '3x12' },
-        { nome: 'Triceps<br>Pulley', series_reps: '3x12' }
-    ],
-    resumoSemanal: {
-        periodo: '9 a 15 de Março',
-        diasTreinados: [
-            { dia: 'Segunda-feira', treinou: true },
-            { dia: 'Terça-feira', treinou: true },
-            { dia: 'Quinta-feira', treinou: false },
-            { dia: 'Sábado', treinou: true }
-        ],
+const usuarioLogado = protegerPagina();
+
+
+
+document.addEventListener("DOMContentLoaded", carregarDashboard);
+
+async function carregarDashboard() {
+    if (!usuarioLogado) {
+        return;
+    }
+
+    try {
+        const [streakSummary, streakHistory, workouts] = await Promise.all([
+            apiFetch(`/streaks/user/${usuarioLogado.id}/summary`),
+            apiFetch(`/streaks/user/${usuarioLogado.id}`),
+            apiFetch(`/workouts/user/${usuarioLogado.id}`)
+        ]);
+
+        const dashboardData = {
+            streak: {
+                current: streakSummary.sequenciaTreinando || 0,
+                days: montarDiasStreak(streakHistory)
+            },
+            treinoDoDia: montarTreinoDoDia(workouts),
+            resumoSemanal: montarResumoSemanal(streakSummary, streakHistory, workouts)
+        };
+
+        renderStreak(dashboardData.streak);
+        renderTreinoDoDia(dashboardData.treinoDoDia);
+        renderResumoSemanal(dashboardData.resumoSemanal);
+    } catch (erro) {
+        console.error("Sincronizacao com o Backend falhou:", erro);
+        const main = document.querySelector(".main") || document.body;
+        main.innerHTML = `<div style="padding: 20px; color: #ff4d4d; text-align: center;">
+                            <h2>Falha de Conexao</h2>
+                            <p>Nao foi possivel carregar os dados do servidor: ${erro.message}</p>
+                          </div>`;
+    }
+}
+
+function montarDiasStreak(historico) {
+    const diasSemana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"];
+    const registrosPorData = new Map((historico || []).map(item => [item.data, item]));
+    const hoje = new Date();
+    const dias = [];
+
+    for (let i = 6; i >= 0; i--) {
+        const data = new Date(hoje);
+        data.setDate(hoje.getDate() - i);
+
+        const chave = data.toISOString().slice(0, 10);
+        const registro = registrosPorData.get(chave);
+
+        dias.push({
+            name: diasSemana[data.getDay()],
+            status: registro ? (registro.treinou ? "treinou" : "nao_treinou") : "pendente"
+        });
+    }
+
+    return dias;
+}
+
+function montarTreinoDoDia(workouts) {
+    if (!workouts || workouts.length === 0) {
+        return [];
+    }
+
+    const exercicios = workouts[0].exercicios || [];
+
+    return exercicios.slice(0, 5).map(ex => ({
+        nome: ex.nomeExercicio || "Exercicio",
+        series_reps: `${ex.series || "-"}x${ex.repeticoes || "-"}`
+    }));
+}
+
+function montarResumoSemanal(streakSummary, streakHistory, workouts) {
+    const historicoOrdenado = [...(streakHistory || [])]
+        .sort((a, b) => a.data.localeCompare(b.data))
+        .slice(-7);
+
+    const diasTreinados = historicoOrdenado.map(item => ({
+        dia: formatarDataBr(item.data),
+        treinou: Boolean(item.treinou)
+    }));
+
+    const primeiroTreino = workouts && workouts.length ? workouts[0] : null;
+    const totalExercicios = primeiroTreino ? (primeiroTreino.exercicios || []).length : 0;
+    const treinouHoje = Boolean(streakSummary.treinouHoje);
+
+    return {
+        periodo: formatarPeriodoSemana(),
+        diasTreinados,
         exerciciosRealizados: [
-            { dia: 'Segunda-feira', feitos: 5, meta: 6 },
-            { dia: 'Terça-feira', feitos: 5, meta: 6 },
-            { dia: 'Quinta-feira', feitos: 0, meta: 0 },
-            { dia: 'Sábado', feitos: 6, meta: 6 }
+            {
+                dia: "Treino atual",
+                feitos: treinouHoje ? totalExercicios : 0,
+                meta: totalExercicios
+            }
         ],
         totais: {
-            treinos_feitos: 3,
-            treinos_meta: 5,
-            exercicios_feitos: 21,
-            exercicios_meta: 30
+            treinos_feitos: streakSummary.totalDiasTreinados || 0,
+            treinos_meta: streakSummary.totalDiasRegistrados || 0,
+            exercicios_feitos: treinouHoje ? totalExercicios : 0,
+            exercicios_meta: totalExercicios
         }
-    }
-};
+    };
+}
 
-// ==========================================
-// INICIALIZAÇÃO
-// ==========================================
-// Aguarda o HTML carregar completamente antes de executar o JS
-document.addEventListener('DOMContentLoaded', () => {
-    renderStreak();
-    renderTreinoDoDia();
-    renderResumoSemanal();
-});
+function formatarPeriodoSemana() {
+    const hoje = new Date();
+    const inicio = new Date(hoje);
+    const dia = hoje.getDay() || 7;
 
-// ==========================================
-// FUNÇÕES DE RENDERIZAÇÃO NO DOM
-// ==========================================
+    inicio.setDate(hoje.getDate() - dia + 1);
 
-function renderStreak() {
-    // 1. Atualiza o número grande do Streak
-    document.querySelector('.streak-number').textContent = mockData.streak.current;
+    const fim = new Date(inicio);
+    fim.setDate(inicio.getDate() + 6);
 
-    // 2. Atualiza os dias do Streak (bolinhas)
-    const streakDaysContainer = document.querySelector('.streak-days');
-    streakDaysContainer.innerHTML = ''; // Limpa os valores estáticos do HTML
+    return `${inicio.toLocaleDateString("pt-BR")} a ${fim.toLocaleDateString("pt-BR")}`;
+}
 
-    mockData.streak.days.forEach(day => {
-        let iconHtml = '';
-        let iconClass = '';
+function renderStreak(streak) {
+    document.querySelector(".streak-number").textContent = streak.current;
 
-        // Define a classe e o ícone baseado no status
-        if (day.status === 'treinou') {
-            iconClass = 'checked';
-            iconHtml = '✓';
-        } else if (day.status === 'descanso') {
-            iconClass = 'rest';
-            iconHtml = 'Z<small>z</small>';
-        } else if (day.status === 'nao_treinou' || day.status === 'pendente') {
-            iconClass = 'empty';
-            iconHtml = '';
+    const streakDaysContainer = document.querySelector(".streak-days");
+    streakDaysContainer.innerHTML = "";
+
+    streak.days.forEach(day => {
+        let iconHtml = "";
+        let iconClass = "";
+
+        if (day.status === "treinou") {
+            iconClass = "checked";
+            iconHtml = "✓";
+        } else if (day.status === "descanso") {
+            iconClass = "rest";
+            iconHtml = "Z<small>z</small>";
+        } else {
+            iconClass = "empty";
+            iconHtml = "";
         }
 
-        // Cria o elemento da coluna do dia
-        const dayCol = document.createElement('div');
-        dayCol.className = 'day-col';
+        const dayCol = document.createElement("div");
+        dayCol.className = "day-col";
         dayCol.innerHTML = `
-            <span class="day-name">${day.name}</span>
+            <span class="day-name">${escapeHtml(day.name)}</span>
             <div class="day-icon ${iconClass}">${iconHtml}</div>
         `;
+
         streakDaysContainer.appendChild(dayCol);
     });
 }
 
-function renderTreinoDoDia() {
-    const exercisesRow = document.querySelector('.exercises-row');
-    exercisesRow.innerHTML = ''; // Limpa os exercícios estáticos
+function renderTreinoDoDia(treinoDoDia) {
+    const exercisesRow = document.querySelector(".exercises-row");
+    exercisesRow.innerHTML = "";
 
-    if (mockData.treinoDoDia.length === 0) {
-        exercisesRow.innerHTML = '<p style="color: white; font-weight: 600; width: 100%; text-align: center; align-self: center;">Hoje é dia de descanso! Aproveite para recarregar as energias. 💤</p>';
+    if (treinoDoDia.length === 0) {
+        exercisesRow.innerHTML = '<p style="color: white; font-weight: 600; width: 100%; text-align: center; align-self: center;">Nenhum treino cadastrado para este usuario.</p>';
         return;
     }
 
-    mockData.treinoDoDia.forEach(ex => {
-        // Cria o card de cada exercício
-        const item = document.createElement('div');
-        item.className = 'exercise-item';
-        item.innerHTML = `
-            <h4>${ex.nome}</h4>
-            <p>${ex.series_reps}</p>
-        `;
+    treinoDoDia.forEach(ex => {
+        const item = document.createElement("div");
+        item.className = "exercise-item";
+
+        const titulo = document.createElement("h4");
+        titulo.textContent = ex.nome;
+
+        const series = document.createElement("p");
+        series.textContent = ex.series_reps;
+
+        item.appendChild(titulo);
+        item.appendChild(series);
         exercisesRow.appendChild(item);
     });
 }
 
-function renderResumoSemanal() {
-    // 1. Atualiza o período
-    document.querySelector('.section-header p').textContent = `Período: ${mockData.resumoSemanal.periodo}`;
+function renderResumoSemanal(resumoSemanal) {
+    document.querySelector(".section-header p").textContent = `Periodo: ${resumoSemanal.periodo}`;
 
-    // 2. Atualiza a lista de Dias Treinados
-    const daysList = document.querySelector('.days-list');
-    daysList.innerHTML = '';
-    mockData.resumoSemanal.diasTreinados.forEach(dia => {
-        const li = document.createElement('li');
-        if (dia.treinou) {
-            li.innerHTML = `<span class="box-icon green">✓</span> ${dia.dia}`;
-        } else {
-            li.className = 'text-muted'; // Deixa o texto cinza
-            li.innerHTML = `<span class="box-icon red">✗</span> ${dia.dia}`;
-        }
+    const daysList = document.querySelector(".days-list");
+    daysList.innerHTML = "";
+
+    if (resumoSemanal.diasTreinados.length === 0) {
+        const li = document.createElement("li");
+        li.className = "text-muted";
+        li.textContent = "Nenhum registro de treino ainda";
         daysList.appendChild(li);
-    });
+    } else {
+        resumoSemanal.diasTreinados.forEach(dia => {
+            const li = document.createElement("li");
 
-    // 3. Atualiza a lista de Exercícios Realizados
-    const exercisesList = document.querySelector('.exercises-list');
-    exercisesList.innerHTML = '';
-    mockData.resumoSemanal.exerciciosRealizados.forEach(dia => {
-        const li = document.createElement('li');
-        if (dia.meta > 0) {
-            li.innerHTML = `<span>${dia.dia}</span> <strong>${dia.feitos} / ${dia.meta}</strong>`;
-        } else {
-            li.className = 'text-muted';
-            li.innerHTML = `<span>${dia.dia}</span> <strong>----</strong>`;
-        }
+            if (dia.treinou) {
+                li.innerHTML = `<span class="box-icon green">✓</span> ${escapeHtml(dia.dia)}`;
+            } else {
+                li.className = "text-muted";
+                li.innerHTML = `<span class="box-icon red">✗</span> ${escapeHtml(dia.dia)}`;
+            }
+
+            daysList.appendChild(li);
+        });
+    }
+
+    const exercisesList = document.querySelector(".exercises-list");
+    exercisesList.innerHTML = "";
+
+    resumoSemanal.exerciciosRealizados.forEach(dia => {
+        const li = document.createElement("li");
+        li.innerHTML = `<span>${escapeHtml(dia.dia)}</span> <strong>${escapeHtml(dia.feitos)} / ${escapeHtml(dia.meta)}</strong>`;
         exercisesList.appendChild(li);
     });
 
-    // 4. Atualiza os cards de Totais
-    // Seleciona os dois cards (índice 0 = treinos, índice 1 = exercícios)
-    const totalCards = document.querySelectorAll('.total-card');
+    const totalCards = document.querySelectorAll(".total-card");
 
-    // Total de Treinos
-    totalCards[0].querySelector('.large-num').textContent = mockData.resumoSemanal.totais.treinos_feitos;
-    totalCards[0].querySelector('.small-num').textContent = `/ ${mockData.resumoSemanal.totais.treinos_meta}`;
-
-    // Total de Exercícios
-    totalCards[1].querySelector('.large-num').textContent = mockData.resumoSemanal.totais.exercicios_feitos;
-    totalCards[1].querySelector('.small-num').textContent = `/ ${mockData.resumoSemanal.totais.exercicios_meta}`;
+    totalCards[0].querySelector(".large-num").textContent = resumoSemanal.totais.treinos_feitos;
+    totalCards[0].querySelector(".small-num").textContent = `/ ${resumoSemanal.totais.treinos_meta}`;
+    totalCards[1].querySelector(".large-num").textContent = resumoSemanal.totais.exercicios_feitos;
+    totalCards[1].querySelector(".small-num").textContent = `/ ${resumoSemanal.totais.exercicios_meta}`;
 }

@@ -1,95 +1,30 @@
-// EXEMPLO
-const dadosCargasMock = [
-    { nome: "Agachamento", ganho: 25 },
-    { nome: "Supino reto", ganho: 12 },
-    { nome: "Levantamento terra", ganho: 30 },
-    { nome: "Leg press", ganho: 18 },
-    { nome: "Cadeira extensora", ganho: 8 },
-    { nome: "Mesa flexora", ganho: 6 },
-    { nome: "Elevação lateral", ganho: 4 },
-    { nome: "Elevação frontal", ganho: 3 },
-    { nome: "Pulley costas", ganho: 15 },
-    { nome: "Remada curvada", ganho: 20 },
-    { nome: "Rosca direta", ganho: 7 },
-    { nome: "Tríceps corda", ganho: 5 },
-    { nome: "Panturrilha em pé", ganho: 10 },
-    { nome: "Panturrilha sentado", ganho: 9 },
-    { nome: "Hack machine", ganho: 22 },
-    { nome: "Afundo", ganho: 14 },
-    { nome: "Desenvolvimento ombro", ganho: 11 },
-    { nome: "Crucifixo", ganho: 2 },
-    { nome: "Pullover", ganho: 1 },
-    { nome: "Abdominal máquina", ganho: 0 } 
-];
+async function carregarDados() {
+    try {
+        const usuarioStr = localStorage.getItem('usuarioLogado');
+        if (!usuarioStr) return;
+        const usuarioLogado = JSON.parse(usuarioStr);
+        
+        // Chamada real ao backend
+        const response = await fetch(`http://localhost:8080/users/${usuarioLogado.id}`);
+        if (!response.ok) throw new Error("Falha ao carregar dados do servidor");
+        const dados = await response.json();
 
+        document.getElementById("user").innerText = dados.nome || "-";
+        document.getElementById("data").innerText = dados.dataNascimento || "-";
+        document.getElementById("idade").innerText = dados.idade || "-";
+        document.getElementById("altura").innerText = dados.altura || "-";
+        document.getElementById("peso").innerText = dados.peso || "-";
 
-const dadosPesoMock = [
-    { mes: "Set/25", peso: 65.2 },
-    { mes: "Out/25", peso: 64.8 },
-    { mes: "Nov/25", peso: 64.1 },
-    { mes: "Dez/25", peso: 63.9 },
-    { mes: "Jan/26", peso: 63.5 },
-    { mes: "Fev/26", peso: 62.8 },
-    { mes: "Mar/26", peso: 62.4 },
-    
-];
-
-
-const historicoMock = [
-    {
-        treino: "Superiores B",
-        data: "17/03/2026",
-        observacao: "Treino pesado e completo!",
-        exercicios: [
-            { nome: "Supino Reto", serie: "3x10", carga: "20kg" },
-            { nome: "Supino Inclinado", serie: "3x10", carga: "20kg" },
-            { nome: "Rosca Direta", serie: "3x12", carga: "20kg" },
-            { nome: "Elevação Lateral", serie: "3x10", carga: "10kg" },
-            { nome: "Tríceps Pulley", serie: "3x12", carga: "20kg" }
-        ]
-    },
-    {
-        treino: "Inferiores C",
-        data: "16/03/2026",
-        observacao: "Treino incompleto",
-        exercicios: [
-            { nome: "Agachamento", serie: "3x10", carga: "20kg" },
-            { nome: "Leg Press", serie: "3x10", carga: "20kg" },
-            { nome: "Cadeira Extensora", serie: "3x12", carga: "20kg" },
-            { nome: "Mesa Flexora", serie: "3x12", carga: "15kg" },
-            { nome: "Panturrilha", serie: "3x10", carga: "20kg" }
-        ]
+        document.getElementById("quadril").innerText = dados.quadril || "-";
+        document.getElementById("peito").innerText = dados.peito || "-";
+        document.getElementById("coxa").innerText = dados.coxa || "-";
+        document.getElementById("cintura").innerText = dados.cintura || "-";
+        document.getElementById("braco").innerText = dados.braco || "-";
+        document.getElementById("panturrilha").innerText = dados.panturrilha || "-";
+    } catch (erro) {
+        console.error("Sincronizacao com o Backend falhou:", erro);
+        document.getElementById("user").innerText = "Falha de Conexao";
     }
-];
-
-
-const dados = {
-    nome: "Eduarda Luiza",
-    data: "20/02/2026",
-    idade: 20,
-    altura: 1.70,
-    peso: 60.2,
-    quadril: 88,
-    peito: 82,
-    coxa: 50,
-    cintura: 62,
-    braco: 24,
-    panturrilha: 32
-};
-
-function carregarDados() {
-    document.getElementById("user").innerText = dados.nome;
-    document.getElementById("data").innerText = dados.data;
-    document.getElementById("idade").innerText = dados.idade;
-    document.getElementById("altura").innerText = dados.altura;
-    document.getElementById("peso").innerText = dados.peso;
-
-    document.getElementById("quadril").innerText = dados.quadril;
-    document.getElementById("peito").innerText = dados.peito;
-    document.getElementById("coxa").innerText = dados.coxa;
-    document.getElementById("cintura").innerText = dados.cintura;
-    document.getElementById("braco").innerText = dados.braco;
-    document.getElementById("panturrilha").innerText = dados.panturrilha;
 }
 
 carregarDados();
@@ -144,13 +79,15 @@ document.getElementById("salvar").onclick = () => {
 
 async function carregarPeso() {
     try {
-        const response = await fetch("/api/peso");
+        const response = await fetch("http://localhost:8080/api/peso");
+        if (!response.ok) throw new Error("Erro na requisição");
         const dados = await response.json();
 
         criarGrafico(dados);
     } catch (erro) {
-        console.log("Usando mock de peso...");
-        criarGrafico(dadosPesoMock);
+        console.error("Sincronizacao com o Backend falhou:", erro);
+        const container = document.getElementById("graficoPeso").parentElement;
+        container.innerHTML = `<p style="color: #ff4d4d; text-align: center; margin-top: 50px;">Falha ao carregar gráfico: ${erro.message}</p>`;
     }
 }
 
@@ -189,13 +126,17 @@ function criarGrafico(dados) {
 
 async function carregarDestaques() {
     try {
-        const response = await fetch("/api/cargas");
+        const response = await fetch("http://localhost:8080/api/cargas");
+        if (!response.ok) throw new Error("Erro na requisição");
         const dados = await response.json();
 
         renderizarDestaques(dados);
     } catch (erro) {
-        console.log("Usando mock de cargas...");
-        renderizarDestaques(dadosCargasMock);
+        console.error("Sincronizacao com o Backend falhou:", erro);
+        const col1 = document.getElementById("coluna1");
+        const col2 = document.getElementById("coluna2");
+        col1.innerHTML = "";
+        col2.innerHTML = `<p style="color: #ff4d4d;">Falha ao carregar destaques: ${erro.message}</p>`;
     }
 }
 
@@ -283,6 +224,23 @@ function renderizarHistorico(lista) {
     });
 }
 
+async function carregarHistorico() {
+    try {
+        const usuarioStr = localStorage.getItem('usuarioLogado');
+        if (!usuarioStr) return;
+        const usuarioLogado = JSON.parse(usuarioStr);
+
+        const response = await fetch(`http://localhost:8080/workouts/user/${usuarioLogado.id}/history`);
+        if (!response.ok) throw new Error("Erro na requisição");
+        const dados = await response.json();
+
+        renderizarHistorico(dados);
+    } catch (erro) {
+        console.error("Sincronizacao com o Backend falhou:", erro);
+        document.querySelector(".table-hist").innerHTML = `<p style="color: #ff4d4d; text-align: center; padding: 20px;">Falha ao carregar histórico: ${erro.message}</p>`;
+    }
+}
+
 carregarPeso();
 carregarDestaques();
-renderizarHistorico(historicoMock);
+carregarHistorico();
