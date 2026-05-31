@@ -1,220 +1,188 @@
-const usuarioLogado = protegerPagina();
+function getToken() {
+    const usuarioStorage = localStorage.getItem("usuarioLogado");
+    return usuarioStorage ? JSON.parse(usuarioStorage).token : null;
+}
 
+function getUserId() {
+    const usuarioStorage = localStorage.getItem("usuarioLogado");
+    if (!usuarioStorage) return null;
+    const user = JSON.parse(usuarioStorage);
+    return user.id || user.userId || user.idUsuario;
+}
 
+async function carregarHome() {
+    const token = getToken();
+    const userId = getUserId();
 
-document.addEventListener("DOMContentLoaded", carregarDashboard);
-
-async function carregarDashboard() {
-    if (!usuarioLogado) {
+    if (!token || !userId) {
+        window.location.href = "login.html";
         return;
     }
 
     try {
-        const [streakSummary, streakHistory, workouts] = await Promise.all([
-            apiFetch(`/streaks/user/${usuarioLogado.id}/summary`),
-            apiFetch(`/streaks/user/${usuarioLogado.id}`),
-            apiFetch(`/workouts/user/${usuarioLogado.id}`)
-        ]);
+        fetch(`http://localhost:8080/users/${userId}`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        }).then(res => res.json()).then(user => {
+            const saudacao = document.getElementById("nome-usuario");
+            if (saudacao) saudacao.innerText = `Olá, ${user.nome.split(" ")[0]}!`;
+        }).catch(err => console.log(err));
 
-        const dashboardData = {
-            streak: {
-                current: streakSummary.sequenciaTreinando || 0,
-                days: montarDiasStreak(streakHistory)
-            },
-            treinoDoDia: montarTreinoDoDia(workouts),
-            resumoSemanal: montarResumoSemanal(streakSummary, streakHistory, workouts)
-        };
-
-        renderStreak(dashboardData.streak);
-        renderTreinoDoDia(dashboardData.treinoDoDia);
-        renderResumoSemanal(dashboardData.resumoSemanal);
-    } catch (erro) {
-        console.error("Sincronizacao com o Backend falhou:", erro);
-        const main = document.querySelector(".main") || document.body;
-        main.innerHTML = `<div style="padding: 20px; color: #ff4d4d; text-align: center;">
-                            <h2>Falha de Conexao</h2>
-                            <p>Nao foi possivel carregar os dados do servidor: ${erro.message}</p>
-                          </div>`;
-    }
-}
-
-function montarDiasStreak(historico) {
-    const diasSemana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"];
-    const registrosPorData = new Map((historico || []).map(item => [item.data, item]));
-    const hoje = new Date();
-    const dias = [];
-
-    for (let i = 6; i >= 0; i--) {
-        const data = new Date(hoje);
-        data.setDate(hoje.getDate() - i);
-
-        const chave = data.toISOString().slice(0, 10);
-        const registro = registrosPorData.get(chave);
-
-        dias.push({
-            name: diasSemana[data.getDay()],
-            status: registro ? (registro.treinou ? "treinou" : "nao_treinou") : "pendente"
+        let treinouHoje = false;
+        const resSummary = await fetch(`http://localhost:8080/streaks/user/${userId}/summary`, {
+            headers: { "Authorization": `Bearer ${token}` }
         });
-    }
+        
+        if (resSummary.ok) {
+            const summary = await resSummary.json();
+            const streakElement = document.querySelector(".streak-number");
+            if (streakElement) streakElement.innerText = summary.sequenciaAtual || summary.sequenciaTreinando || 0;
+            treinouHoje = summary.treinouHoje; 
+        }
 
-    return dias;
+        const resHistorico = await fetch(`http://localhost:8080/streaks/user/${userId}`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (resHistorico.ok) {
+            const historico = await resHistorico.json();
+            renderizarBolinhas(historico);
+        }
+
+        carregarFichaNaHome(userId, token, treinouHoje);
+
+    } catch (error) {
+        console.error(error);
+    }
 }
 
-function montarTreinoDoDia(workouts) {
-    if (!workouts || workouts.length === 0) {
-        return [];
-    }
+async function carregarFichaNaHome(userId, token, treinouHoje) {
+    try {
+        const response = await fetch(`http://localhost:8080/workouts/user/${userId}`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
 
-    const exercicios = workouts[0].exercicios || [];
+        if (response.ok) {
+            const planos = await response.json();
+            if (planos.length > 0) {
+                const planoAtual = planos[planos.length - 1];
+                const exercicios = planoAtual.exercicios || [];
 
-    return exercicios.slice(0, 5).map(ex => ({
-        nome: ex.nomeExercicio || "Exercicio",
-        series_reps: `${ex.series || "-"}x${ex.repeticoes || "-"}`
-    }));
-}
-
-function montarResumoSemanal(streakSummary, streakHistory, workouts) {
-    const historicoOrdenado = [...(streakHistory || [])]
-        .sort((a, b) => a.data.localeCompare(b.data))
-        .slice(-7);
-
-    const diasTreinados = historicoOrdenado.map(item => ({
-        dia: formatarDataBr(item.data),
-        treinou: Boolean(item.treinou)
-    }));
-
-    const primeiroTreino = workouts && workouts.length ? workouts[0] : null;
-    const totalExercicios = primeiroTreino ? (primeiroTreino.exercicios || []).length : 0;
-    const treinouHoje = Boolean(streakSummary.treinouHoje);
-
-    return {
-        periodo: formatarPeriodoSemana(),
-        diasTreinados,
-        exerciciosRealizados: [
-            {
-                dia: "Treino atual",
-                feitos: treinouHoje ? totalExercicios : 0,
-                meta: totalExercicios
+                renderizarTreinoDoDia(exercicios, treinouHoje);
+                renderizarResumoSemanal(exercicios);
+            } else {
+                renderizarTreinoDoDia([], false);
+                renderizarResumoSemanal([]);
             }
-        ],
-        totais: {
-            treinos_feitos: streakSummary.totalDiasTreinados || 0,
-            treinos_meta: streakSummary.totalDiasRegistrados || 0,
-            exercicios_feitos: treinouHoje ? totalExercicios : 0,
-            exercicios_meta: totalExercicios
         }
-    };
+    } catch (error) {
+        console.error(error);
+    }
 }
 
-function formatarPeriodoSemana() {
-    const hoje = new Date();
-    const inicio = new Date(hoje);
-    const dia = hoje.getDay() || 7;
+function renderizarBolinhas(historico) {
+    const container = document.querySelector(".streak-days");
+    if (!container) return;
+    
+    container.innerHTML = ""; 
+    const diasSemana = ["D", "S", "T", "Q", "Q", "S", "S"];
 
-    inicio.setDate(hoje.getDate() - dia + 1);
+    historico.forEach(diaLog => {
+        const partes = diaLog.data.split('-'); 
+        const dataObj = new Date(partes[0], partes[1] - 1, partes[2]);
+        const letraDia = diasSemana[dataObj.getDay()];
 
-    const fim = new Date(inicio);
-    fim.setDate(inicio.getDate() + 6);
+        const classeStatus = diaLog.treinou ? "checked" : "rest";
 
-    return `${inicio.toLocaleDateString("pt-BR")} a ${fim.toLocaleDateString("pt-BR")}`;
-}
-
-function renderStreak(streak) {
-    document.querySelector(".streak-number").textContent = streak.current;
-
-    const streakDaysContainer = document.querySelector(".streak-days");
-    streakDaysContainer.innerHTML = "";
-
-    streak.days.forEach(day => {
-        let iconHtml = "";
-        let iconClass = "";
-
-        if (day.status === "treinou") {
-            iconClass = "checked";
-            iconHtml = "✓";
-        } else if (day.status === "descanso") {
-            iconClass = "rest";
-            iconHtml = "Z<small>z</small>";
-        } else {
-            iconClass = "empty";
-            iconHtml = "";
-        }
-
-        const dayCol = document.createElement("div");
-        dayCol.className = "day-col";
-        dayCol.innerHTML = `
-            <span class="day-name">${escapeHtml(day.name)}</span>
-            <div class="day-icon ${iconClass}">${iconHtml}</div>
+        container.innerHTML += `
+            <div class="day">
+                <span class="day-name">${letraDia}</span>
+                <div class="day-icon ${classeStatus}"></div>
+            </div>
         `;
-
-        streakDaysContainer.appendChild(dayCol);
     });
 }
 
-function renderTreinoDoDia(treinoDoDia) {
-    const exercisesRow = document.querySelector(".exercises-row");
-    exercisesRow.innerHTML = "";
+function renderizarTreinoDoDia(exercicios, treinouHoje) {
+    const container = document.getElementById("lista-treino-dia"); 
+    if (!container) return;
 
-    if (treinoDoDia.length === 0) {
-        exercisesRow.innerHTML = '<p style="color: white; font-weight: 600; width: 100%; text-align: center; align-self: center;">Nenhum treino cadastrado para este usuario.</p>';
+    if (treinouHoje) {
+         container.innerHTML = `
+            <div style="text-align:center; padding: 30px; background: rgba(255,255,255,0.02); border-radius: 12px; margin-top: 15px;">
+                <h3 style="color:#4CAF50; margin: 0; font-family: 'Russo One', sans-serif;">✅ Treino Concluído!</h3>
+                <p style="color: #aaa; margin-top: 10px;">Excelente trabalho! O seu treino de hoje já foi registado. Bom descanso.</p>
+            </div>`;
+         return;
+    }
+
+    const diasDaSemana = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sabado"];
+    const hojeNome = diasDaSemana[new Date().getDay()].toLowerCase(); 
+
+    const exerciciosHoje = exercicios.filter(ex => {
+        const diaBanco = (ex.diaSemana || "").toLowerCase();
+        return diaBanco.startsWith(hojeNome.substring(0, 3)); 
+    });
+
+    container.innerHTML = "";
+
+    if (exercicios.length === 0) {
+        container.innerHTML = "<p style='color: #888; text-align: center; padding: 20px;'>Nenhuma ficha criada. Vá à página de Fichas para gerar um treino!</p>";
         return;
     }
 
-    treinoDoDia.forEach(ex => {
-        const item = document.createElement("div");
-        item.className = "exercise-item";
-
-        const titulo = document.createElement("h4");
-        titulo.textContent = ex.nome;
-
-        const series = document.createElement("p");
-        series.textContent = ex.series_reps;
-
-        item.appendChild(titulo);
-        item.appendChild(series);
-        exercisesRow.appendChild(item);
-    });
-}
-
-function renderResumoSemanal(resumoSemanal) {
-    document.querySelector(".section-header p").textContent = `Periodo: ${resumoSemanal.periodo}`;
-
-    const daysList = document.querySelector(".days-list");
-    daysList.innerHTML = "";
-
-    if (resumoSemanal.diasTreinados.length === 0) {
-        const li = document.createElement("li");
-        li.className = "text-muted";
-        li.textContent = "Nenhum registro de treino ainda";
-        daysList.appendChild(li);
-    } else {
-        resumoSemanal.diasTreinados.forEach(dia => {
-            const li = document.createElement("li");
-
-            if (dia.treinou) {
-                li.innerHTML = `<span class="box-icon green">✓</span> ${escapeHtml(dia.dia)}`;
-            } else {
-                li.className = "text-muted";
-                li.innerHTML = `<span class="box-icon red">✗</span> ${escapeHtml(dia.dia)}`;
-            }
-
-            daysList.appendChild(li);
-        });
+    if (exerciciosHoje.length === 0) {
+        container.innerHTML = "<p style='color: #888; text-align: center; padding: 20px;'>Hoje é o seu dia de descanso (ou não há exercícios programados). Recupere as energias!</p>";
+        return;
     }
 
-    const exercisesList = document.querySelector(".exercises-list");
-    exercisesList.innerHTML = "";
+    exerciciosHoje.forEach(ex => {
+        const cargaTexto = ex.cargaRecomendada ? `${ex.cargaRecomendada}kg` : "Ajustar";
+        
+        container.innerHTML += `
+            <div style="background: rgba(255,255,255,0.05); padding: 15px 20px; border-radius: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #6c63ff;">
+                <div>
+                    <h4 style="margin: 0; color: #fff; text-transform: capitalize; font-size: 16px;">${ex.nomeExercicio}</h4>
+                    <span style="font-size: 13px; color: #aaa; text-transform: capitalize;">${ex.grupoMuscular}</span>
+                </div>
+                <div style="text-align: right;">
+                    <span style="display: block; color: #6c63ff; font-weight: bold; font-size: 16px;">${ex.series} x ${ex.repeticoes}</span>
+                    <span style="font-size: 12px; color: #ddd; background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 10px; margin-top: 4px; display: inline-block;">Carga: ${cargaTexto}</span>
+                </div>
+            </div>
+        `;
+    });
+}
 
-    resumoSemanal.exerciciosRealizados.forEach(dia => {
-        const li = document.createElement("li");
-        li.innerHTML = `<span>${escapeHtml(dia.dia)}</span> <strong>${escapeHtml(dia.feitos)} / ${escapeHtml(dia.meta)}</strong>`;
-        exercisesList.appendChild(li);
+function renderizarResumoSemanal(exercicios) {
+    const container = document.getElementById("lista-resumo-semanal"); 
+    if (!container) return;
+
+    if (exercicios.length === 0) {
+        container.innerHTML = "<p style='color: #888; padding: 20px;'>Sem dados.</p>";
+        return;
+    }
+
+    const resumo = {};
+    exercicios.forEach(ex => {
+        const dia = ex.diaSemana || "Indefinido";
+        if (!resumo[dia]) resumo[dia] = new Set();
+        if (ex.grupoMuscular) resumo[dia].add(ex.grupoMuscular);
     });
 
-    const totalCards = document.querySelectorAll(".total-card");
-
-    totalCards[0].querySelector(".large-num").textContent = resumoSemanal.totais.treinos_feitos;
-    totalCards[0].querySelector(".small-num").textContent = `/ ${resumoSemanal.totais.treinos_meta}`;
-    totalCards[1].querySelector(".large-num").textContent = resumoSemanal.totais.exercicios_feitos;
-    totalCards[1].querySelector(".small-num").textContent = `/ ${resumoSemanal.totais.exercicios_meta}`;
+    container.innerHTML = "";
+    
+    for (const [dia, musculosSet] of Object.entries(resumo)) {
+        const musculosText = Array.from(musculosSet).join(", ") || "Treino Geral";
+        
+        container.innerHTML += `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2); margin-bottom: 5px; border-radius: 6px;">
+                <span style="color: #fff; font-family: 'Russo One', sans-serif; font-size: 14px; text-transform: capitalize; width: 30%;">${dia}</span>
+                <span style="color: #a78bfa; text-transform: capitalize; font-size: 14px; text-align: right; width: 70%; font-weight: bold;">${musculosText}</span>
+            </div>
+        `;
+    }
 }
+
+window.onload = () => {
+    carregarHome();
+};

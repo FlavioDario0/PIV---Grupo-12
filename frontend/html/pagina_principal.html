@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kineo - Home</title> <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/pagina_principal.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,125 +24,41 @@
             <a href="perfil.html">Perfil</a>
         </nav>
     </header>
+    
     <div class="app-container">
         <main class="dashboard">
             <section class="top-section">
                 <div class="streak-card">
                     <div class="streak-content">
-                        <div class="streak-number">30</div>
+                        <div class="streak-number">0</div>
                         <div class="streak-label">DAY STREAK</div>
                     </div>
                     <div class="streak-days">
-                        <div class="day-col">
-                            <span class="day-name">Seg</span>
-                            <div class="day-icon checked">✓</div>
                         </div>
-                        <div class="day-col">
-                            <span class="day-name">Ter</span>
-                            <div class="day-icon checked">✓</div>
-                        </div>
-                        <div class="day-col">
-                            <span class="day-name">Qua</span>
-                            <div class="day-icon rest">Z<small>z</small></div>
-                        </div>
-                        <div class="day-col">
-                            <span class="day-name">Qui</span>
-                            <div class="day-icon checked">✓</div>
-                        </div>
-                        <div class="day-col">
-                            <span class="day-name">Sex</span>
-                            <div class="day-icon rest">Z<small>z</small></div>
-                        </div>
-                        <div class="day-col">
-                            <span class="day-name">Sáb</span>
-                            <div class="day-icon empty"></div>
-                        </div>
-                        <div class="day-col">
-                            <span class="day-name">Dom</span>
-                            <div class="day-icon rest">Z<small>z</small></div>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="workout-card">
                     <h2 class="workout-title">TREINO DO DIA</h2>
-                    <div class="exercises-row">
-                        <div class="exercise-item">
-                            <h4>Supino Reto</h4>
-                            <p>3x12</p>
-                        </div>
-                        <div class="exercise-item">
-                            <h4>Supino<br>Inclinado</h4>
-                            <p>3x10</p>
-                        </div>
-                        <div class="exercise-item">
-                            <h4>Rosca Direta</h4>
-                            <p>3x10</p>
-                        </div>
-                        <div class="exercise-item">
-                            <h4>Elevação<br>Lateral</h4>
-                            <p>3x12</p>
-                        </div>
-                        <div class="exercise-item">
-                            <h4>Triceps<br>Pulley</h4>
-                            <p>3x12</p>
-                        </div>
+                    
+                    <div id="lista-treino-dia">
+                        <p style="color: #888; text-align: center; padding: 20px;">A carregar o seu treino...</p>
                     </div>
+                    
                 </div>
             </section>
 
             <section class="bottom-section">
                 <div class="section-header">
-                    <h2>RESUMO SEMANAL</h2>
-                    <p>Período: 9 a 15 de Março</p>
+                    <h2>CRONOGRAMA SEMANAL</h2>
                 </div>
 
-                <div class="summary-grid">
-                    <div class="summary-card">
-                        <h3>Dias treinados</h3>
-                        <ul class="days-list">
-                            <li><span class="box-icon green">✓</span> Segunda-feira</li>
-                            <li><span class="box-icon green">✓</span> Terça-feira</li>
-                            <li class="text-muted"><span class="box-icon red">✗</span> Quinta-feira</li>
-                            <li><span class="box-icon green">✓</span> Sábado</li>
-                        </ul>
-                    </div>
-
-                    <div class="summary-card">
-                        <h3>Exercícios realizados</h3>
-                        <ul class="exercises-list">
-                            <li><span>Segunda-feira</span> <strong>5 / 6</strong></li>
-                            <li><span>Terça-feira</span> <strong>5 / 6</strong></li>
-                            <li class="text-muted"><span>Quinta-feira</span> <strong>----</strong></li>
-                            <li><span>Sábado</span> <strong>6 / 6</strong></li>
-                        </ul>
-                    </div>
-
-                    <div class="summary-card total-card">
-                        <h3>Total de treinos</h3>
-                        <div class="total-inner">
-                            <div class="total-number">
-                                <span class="large-num">3</span>
-                                <span class="small-num">/ 5</span>
-                            </div>
-                            <p>Treinos realizados!</p>
-                        </div>
-                    </div>
-
-                    <div class="summary-card total-card">
-                        <h3>Total de exercícios</h3>
-                        <div class="total-inner">
-                            <div class="total-number">
-                                <span class="large-num">21</span>
-                                <span class="small-num">/ 30</span>
-                            </div>
-                            <p>Exercícios realizados!</p>
-                        </div>
-                    </div>
+                <div id="lista-resumo-semanal" style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px;">
+                    <p style="color: #888; text-align: center; padding: 20px;">A carregar o seu cronograma...</p>
                 </div>
             </section>
         </main>
     </div>
+    
 <script src="../js/global.js"></script>
 <script src="../js/pagina_principal.js"></script>
 </body>

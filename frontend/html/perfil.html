@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Kineo</title>
+    <title>Kineo - Perfil</title>
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/perfil.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,7 +26,7 @@
         </nav>        
     </header>
 
-    <div class="username" id="user">[Username]</div>
+    <div class="username" id="user">Carregando...</div>
 
     <div class="card-user">
         <div class="bloco">
@@ -38,7 +38,7 @@
         <div class="bloco">
             <span class="label">Idade</span>
             <span class="valor" id="idade">--</span>
-            <span></span>
+            <span class="sub">anos</span>
         </div>
 
         <div class="bloco">
@@ -53,19 +53,16 @@
             <span class="sub">(kg)</span>
         </div>
 
-        <div class="bloco medidas">
-            <span class="label">Medidas Corporais</span>
+        <div class="bloco">
+            <span class="label">Objetivo</span>
+            <span class="valor" id="objetivo" style="font-size: 22px; text-transform: capitalize;">--</span>
+            <span></span>
+        </div>
 
-            <div class="grid-medidas">
-                <div><span>Quadril:</span> <b id="quadril">--</b></div>
-                <div><span>Peito:</span> <b id="peito">--</b></div>
-                <div><span>Coxa:</span> <b id="coxa">--</b></div>
-
-                <div><span>Cintura:</span> <b id="cintura">--</b></div>
-                <div><span>Braço:</span> <b id="braco">--</b></div>
-                <div><span>Panturrilha:</span> <b id="panturrilha">--</b></div>
-            </div>
-            <span class="sub-medidas">(cm)</span>
+        <div class="bloco">
+            <span class="label">Nível</span>
+            <span class="valor" id="nivel" style="font-size: 22px; text-transform: capitalize;">--</span>
+            <span></span>
         </div>
     </div>
 
@@ -97,60 +94,31 @@
         </div>        
     </div>
 
-
     <div id="modal-atualizar" class="modal hidden">
         <div class="modal-content">
             <h3>Atualizar dados</h3>
             <div class="row">
                 <div class="campo">
-                    <label>Idade</label>
-                    <input id="idade-card" class="inp">
+                    <label>Altura (m)</label>
+                    <input id="altura-card" class="inp" type="number" step="0.01">
                 </div>
                 <div class="campo">
-                    <label>Altura</label>
-                    <input id="altura-card" class="inp">
-                </div>
+                    <label>Peso (kg)</label>
+                    <input id="peso-card" class="inp" type="number" step="0.1">
+                </div> 
                 <div class="campo">
-                    <label>Peso</label>
-                    <input id="peso-card" class="inp">
-                </div>                
+                    <label>Nível</label>
+                    <select id="nivel-card" class="inp" style="height: 44px; background: #222; color: #fff; border: none; border-radius: 8px;">
+                        <option value="iniciante">Iniciante</option>
+                        <option value="intermediario">Intermediário</option>
+                        <option value="avancado">Avançado</option>
+                    </select>
+                </div>               
             </div>
-            <br>
-            <label class="medidas-corp">Medidas Corporais</label>
-
-            <div class="row">
-                <div class="campo">
-                    <label>Quadril</label>
-                    <input id="quadril-card" class="inp">
-                </div>
-                <div class="campo">
-                    <label>Peito</label>
-                    <input id="peito-card" class="inp">
-                </div>
             
-                <div class="campo">
-                    <label>Coxa</label>
-                    <input id="coxa-card" class="inp">
-                </div>
-            </div>
-            <div class="row">
-                <div class="campo">
-                    <label>Cintura</label>
-                    <input id="cintura-card" class="inp">
-                </div>
-                <div class="campo">
-                    <label>Braço</label>
-                    <input id="braco-card" class="inp">
-                </div>
-                <div class="campo">
-                    <label>Panturrilha</label>
-                    <input id="panturrilha-card" class="inp">
-                </div>
-            </div>            
-            
-            <div class="modal-actions">
+            <div class="modal-actions" style="margin-top: 25px;">
                 <button id="cancelar">Cancelar</button>
-                <button id="salvar">Salvar</button>
+                <button id="salvar">Salvar (Apenas Visual)</button>
             </div>
         </div>
     </div>
