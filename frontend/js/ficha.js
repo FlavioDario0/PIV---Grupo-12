@@ -3,7 +3,6 @@ let diaSelecionado = "Seg";
 let cardEditando = null;
 let cardParaExcluir = null;
 
-
 function getSemanaAtual() {
     const agora = new Date();
     const d = new Date(Date.UTC(agora.getFullYear(), agora.getMonth(), agora.getDate()));
@@ -53,12 +52,10 @@ function getDiasComTreino() {
     return [...encontrados];
 }
 
-
 function criarBarraSemanal() {
     const antiga = document.getElementById("barra-semanal");
     if (antiga) antiga.remove();
 
-    
     const botoesTreinos = document.querySelector(".treinos");
     if (botoesTreinos) botoesTreinos.style.display = "none";
 
@@ -87,7 +84,6 @@ function criarBarraSemanal() {
         <span id="count-semanal" style="white-space: nowrap; font-size: 11px; color: #aaa;">0/0 dias</span>
     `;
 
-    
     const diasDiv = document.querySelector(".dias");
     if (diasDiv) {
         diasDiv.insertAdjacentElement("afterend", barra);
@@ -111,7 +107,6 @@ function atualizarBarraSemanal() {
     if (count) count.textContent = `${concluidos}/${total} dias`;
 }
 
-
 function mostrarTelaConclusao(dia) {
     const tableBody = document.getElementById("table-body");
     const progressBar = document.getElementById("progress");
@@ -124,7 +119,6 @@ function mostrarTelaConclusao(dia) {
     const concluidos = progresso.diasConcluidos.filter(d => diasComTreino.includes(d)).length;
     const total = diasComTreino.length;
 
-    
     if (concluidos >= total && total > 0) {
         tableBody.innerHTML = `
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; text-align: center; gap: 14px;">
@@ -151,7 +145,6 @@ function mostrarTelaConclusao(dia) {
             </div>
         `;
 
-        
         setTimeout(() => {
             document.getElementById("btn-reset-semana").addEventListener("click", () => {
                 localStorage.removeItem("progressoSemanal");
@@ -159,8 +152,7 @@ function mostrarTelaConclusao(dia) {
             });
         }, 100);
 
-    } 
-    else {
+    } else {
         tableBody.innerHTML = `
             <div style="
                 display: flex;
@@ -183,7 +175,6 @@ function mostrarTelaConclusao(dia) {
         `;
     }
 
-    
     if (progressBar) progressBar.style.width = "100%";
     if (countAtual) countAtual.textContent = "✓";
     if (countTotal) countTotal.textContent = "";
@@ -202,18 +193,17 @@ window.onload = async () => {
     const containerFicha = document.querySelector(".container");
     const emptyState = document.getElementById("empty-state");
     const idDoUsuario = usuario.id || usuario.userId || usuario.idUsuario;
-    const token = usuario.token; // <-- PEGA O TOKEN DO USUÁRIO
+    const token = usuario.token;
 
     const labelProgressao = document.querySelector(".progresso label, .progress-label, .label-progresso");
     if (labelProgressao) labelProgressao.textContent = "Progressão Diária";
 
     try {
-        // MANDA O TOKEN NO CABEÇALHO (HEADER) DA REQUISIÇÃO
         const response = await fetch(`http://localhost:8080/workouts/user/${idDoUsuario}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}` // <-- AUTORIZAÇÃO AQUI
+                "Authorization": `Bearer ${token}`
             }
         });
         
@@ -221,7 +211,6 @@ window.onload = async () => {
             const dadosDoBanco = await response.json();
             
             if (Array.isArray(dadosDoBanco) && dadosDoBanco.length > 0) {
-                // Pega a ficha mais recente
                 if (dadosDoBanco[dadosDoBanco.length - 1].exercicios) {
                     treinoCompleto = dadosDoBanco[dadosDoBanco.length - 1].exercicios || [];
                 } else {
@@ -293,8 +282,13 @@ function renderTela(dia) {
     }
 
     const exerciciosDoDia = treinoCompleto.filter(ex => {
-        const diaDoBanco = ex.diaSemana || ex.dia_semana || ex.diaDaSemana || "";
-        return diaDoBanco.toLowerCase().startsWith(dia.toLowerCase());
+        const diaDoBanco = (ex.diaSemana || ex.dia_semana || ex.diaDaSemana || "").toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, ""); // Remove acentos
+            
+        const diaComparacao = dia.toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, ""); // Remove acentos
+            
+        return diaDoBanco.startsWith(diaComparacao.substring(0, 3));
     });
 
     const totalExercicios = exerciciosDoDia.length;
@@ -351,7 +345,6 @@ function renderTela(dia) {
     });
 }
 
-
 document.getElementById("btn-criar-ficha").addEventListener("click", async () => {
     const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
     const btn = document.getElementById("btn-criar-ficha");
@@ -371,7 +364,7 @@ document.getElementById("btn-criar-ficha").addEventListener("click", async () =>
     const payload = {
         userId: idDoUsuario,
         objetivo: usuario.objetivo || "Hipertrofia",
-        dias: "4",
+        frequenciaTreinos: usuario.frequenciaTreinos || "4 dias por semana",
         nivel: usuario.nivel || "Intermediário"
     };
 
@@ -431,7 +424,6 @@ document.querySelector(".finish").addEventListener("click", async () => {
         botaoFinalizar.style.pointerEvents = "none";
 
         const promessasDeReq = [];
-        const nomesExerciciosFeitos = [];
 
         botoesCheck.forEach(btn => {
             const row = btn.closest(".row");
@@ -440,17 +432,15 @@ document.querySelector(".finish").addEventListener("click", async () => {
             const workoutExerciseId = btn.getAttribute("data-id");
             const inputCarga = row.querySelector(".input-carga");
             const inputReps = row.querySelector(".input-reps");
-            const spanNome = row.querySelector("span");
 
             const cargaUsada = inputCarga ? parseFloat(inputCarga.value) : 0;
             const repsFeitas = inputReps ? parseInt(inputReps.value) : 0;
-            nomesExerciciosFeitos.push(spanNome ? spanNome.textContent : "Exercício");
 
             const requisicao = fetch("http://localhost:8080/treino/finalizar-exercicio", {
                 method: "POST",
                 headers: { 
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}` // <-- AUTORIZAÇÃO AQUI
+                    "Authorization": `Bearer ${token}` 
                 },
                 body: JSON.stringify({
                     userId: idDoUsuario,
@@ -484,36 +474,81 @@ document.querySelector(".finish").addEventListener("click", async () => {
     }
 });
 
-const modal = document.getElementById("modal-obs");
-const btnAbrir = document.querySelector(".sidebar .btn"); // Seletor ajustado
-const btnCancelar = document.getElementById("cancelar");
-const inputObs = document.getElementById("input-obs");
-
-if (btnAbrir) {
-    btnAbrir.addEventListener("click", () => modal.classList.remove("hidden"));
-}
-if (btnCancelar) {
-    btnCancelar.addEventListener("click", () => {
-        modal.classList.add("hidden");
-        if (inputObs) inputObs.value = "";
-    });
-}
-
+// Modal Delete e Observações (Lógica Protegida)
 const modalDelete = document.getElementById("modal-delete");
 const btnCancelarDelete = document.getElementById("cancelar-delete");
 const btnConfirmarDelete = document.getElementById("confirmar-delete");
 
-if (btnCancelarDelete) {
+if (btnCancelarDelete && modalDelete) {
     btnCancelarDelete.addEventListener("click", () => {
         modalDelete.classList.add("hidden");
         cardParaExcluir = null;
     });
 }
 
-if (btnConfirmarDelete) {
+if (btnConfirmarDelete && modalDelete) {
     btnConfirmarDelete.addEventListener("click", () => {
         if (cardParaExcluir) cardParaExcluir.remove();
         modalDelete.classList.add("hidden");
         cardParaExcluir = null;
     });
+}
+
+// LÓGICA DO CARROSSEL TUTORIAL
+let slideAtual = 0;
+const totalSlides = 4;
+
+// Esta função é chamada ao clicar no botão "💡 Como funciona a IA?" no HTML
+function abrirTutorial() {
+    slideAtual = 0;
+    atualizarCarrossel();
+    const modalTutorial = document.getElementById("tutorial-modal");
+    if (modalTutorial) modalTutorial.classList.remove("hidden");
+}
+
+function fecharTutorial() {
+    const modalTutorial = document.getElementById("tutorial-modal");
+    if (modalTutorial) modalTutorial.classList.add("hidden");
+}
+
+function irParaSlide(index) {
+    slideAtual = index;
+    atualizarCarrossel();
+}
+
+function proximoSlide() {
+    if (slideAtual < totalSlides - 1) {
+        slideAtual++;
+        atualizarCarrossel();
+    } else {
+        fecharTutorial();
+    }
+}
+
+function atualizarCarrossel() {
+    const slides = document.querySelectorAll(".carousel-slide");
+    const dots = document.querySelectorAll(".dot");
+    const btnProximo = document.getElementById("btn-proximo");
+
+    slides.forEach((slide, i) => {
+        if (i === slideAtual) {
+            slide.classList.add("active");
+            if (dots[i]) dots[i].classList.add("active");
+        } else {
+            slide.classList.remove("active");
+            if (dots[i]) dots[i].classList.remove("active");
+        }
+    });
+
+    if (btnProximo) {
+        if (slideAtual === totalSlides - 1) {
+            btnProximo.innerText = "Começar Treino!";
+            btnProximo.style.background = "#4CAF50"; 
+            btnProximo.style.boxShadow = "0 4px 15px rgba(76, 175, 80, 0.3)";
+        } else {
+            btnProximo.innerText = "Próximo";
+            btnProximo.style.background = "#6c63ff";
+            btnProximo.style.boxShadow = "0 4px 15px rgba(108, 99, 255, 0.3)";
+        }
+    }
 }

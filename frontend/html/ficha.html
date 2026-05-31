@@ -64,7 +64,9 @@
             </div>
 
             <aside class="sidebar">
-                <button class="btn">Adicionar Observação</button>
+                <button class="btn" onclick="abrirTutorial()" style="display: flex; align-items: center; gap: 8px;">
+                    <span>💡</span> Como funciona a IA?
+                </button>
             </aside>
         </div>
 
@@ -113,5 +115,49 @@
 
     <script src="../js/global.js"></script>
     <script src="../js/ficha.js"></script>
+    <div id="tutorial-modal" class="modal hidden">
+        <div class="tutorial-content">
+            <div class="carousel-container">
+                
+                <div class="carousel-slide active">
+                    <div class="slide-icon">🎯</div>
+                    <h3 class="slide-title">Calibrando o seu treino</h3>
+                    <p class="slide-text">Na primeira semana de treino, a sua principal missão é informar qual carga utilizou em cada exercício. Isto servirá como a sua base de força!</p>
+                </div>
+
+                <div class="carousel-slide">
+                    <div class="slide-icon">🧠</div>
+                    <h3 class="slide-title">A IA entra em ação</h3>
+                    <p class="slide-text">Com base na sua primeira semana, a nossa Inteligência Artificial já preparará tudo para a semana seguinte, calculando a progressão ideal para o seu corpo.</p>
+                </div>
+
+                <div class="carousel-slide">
+                    <div class="slide-icon">⚖️</div>
+                    <h3 class="slide-title">Liberdade e Adaptação</h3>
+                    <p class="slide-text">Fez mais repetições ou usou uma carga diferente da recomendada? Não há problema! Registe o que realmente fez. A nossa IA analisará o seu desempenho e atualizará a próxima recomendação automaticamente.</p>
+                </div>
+
+                <div class="carousel-slide">
+                    <div class="slide-icon">🚀</div>
+                    <h3 class="slide-title">Evolução Contínua</h3>
+                    <p class="slide-text">Ao longo dos treinos, ajustaremos as suas cargas de forma dinâmica. Esqueça a estagnação. Foque em treinar, nós cuidamos da matemática. Bom treino!</p>
+                </div>
+
+            </div>
+
+            <div class="carousel-footer">
+                <div class="carousel-dots">
+                    <span class="dot active" onclick="irParaSlide(0)"></span>
+                    <span class="dot" onclick="irParaSlide(1)"></span>
+                    <span class="dot" onclick="irParaSlide(2)"></span>
+                    <span class="dot" onclick="irParaSlide(3)"></span>
+                </div>
+                <div class="carousel-actions">
+                    <button id="btn-pular" class="btn-secundario" onclick="fecharTutorial()">Pular</button>
+                    <button id="btn-proximo" class="btn-primario" onclick="proximoSlide()">Próximo</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

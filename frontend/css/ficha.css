@@ -417,3 +417,138 @@ button.ativo {
 .hidden {
     display: none !important;
 }
+
+#tutorial-modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+}
+
+#tutorial-modal.hidden {
+    display: none !important;
+}
+
+.tutorial-content {
+    background: #16161a;
+    width: 90%;
+    max-width: 480px;
+    border-radius: 20px;
+    padding: 40px 30px;
+    box-shadow: 0 15px 40px rgba(108, 99, 255, 0.2);
+    border: 1px solid rgba(108, 99, 255, 0.3);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.carousel-container {
+    min-height: 220px;
+    position: relative;
+}
+
+.carousel-slide {
+    display: none;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.carousel-slide.active {
+    display: block;
+}
+
+.slide-icon {
+    font-size: 50px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 10px rgba(108, 99, 255, 0.5));
+}
+
+.slide-title {
+    font-family: 'Russo One', sans-serif;
+    color: #fff;
+    font-size: 22px;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+}
+
+.slide-text {
+    font-family: 'Inter', sans-serif;
+    color: #aaa;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.carousel-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+}
+
+.carousel-dots {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dot.active {
+    background: #6c63ff;
+    transform: scale(1.3);
+    box-shadow: 0 0 10px #6c63ff;
+}
+
+.carousel-actions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 15px;
+}
+
+.btn-secundario {
+    background: transparent;
+    color: #888;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 12px 20px;
+    transition: 0.3s;
+}
+
+.btn-secundario:hover {
+    color: #fff;
+}
+
+.btn-primario {
+    background: #6c63ff;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    padding: 12px 30px;
+    cursor: pointer;
+    flex-grow: 1;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+}
+
+.btn-primario:hover {
+    background: #574bfa;
+    transform: translateY(-2px);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
