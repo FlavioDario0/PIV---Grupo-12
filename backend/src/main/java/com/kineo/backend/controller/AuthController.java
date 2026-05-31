@@ -49,6 +49,7 @@ public class AuthController {
             respostaCompleta.put("email", user.getEmail());
             respostaCompleta.put("objetivo", user.getObjetivo());
             respostaCompleta.put("nivel", user.getNivel());
+            respostaCompleta.put("frequenciaTreinos", user.getFrequenciaTreinos());
 
             return ResponseEntity.ok(respostaCompleta);
         }

@@ -1,116 +1,81 @@
 package com.kineo.backend.service;
 
-import com.kineo.backend.dto.StreakRequest;
 import com.kineo.backend.dto.StreakResponse;
 import com.kineo.backend.dto.StreakSummaryResponse;
-import com.kineo.backend.entity.Streak;
-import com.kineo.backend.entity.User;
-import com.kineo.backend.repository.StreakRepository;
-import com.kineo.backend.repository.UserRepository;
+import com.kineo.backend.entity.WorkoutLog;
+import com.kineo.backend.repository.WorkoutLogRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class StreakService {
 
-    private final StreakRepository streakRepository;
-    private final UserRepository userRepository;
+    private final WorkoutLogRepository workoutLogRepository;
 
-    public StreakService(StreakRepository streakRepository, UserRepository userRepository) {
-        this.streakRepository = streakRepository;
-        this.userRepository = userRepository;
-    }
-
-    public StreakResponse marcarHoje(StreakRequest request) {
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
-        LocalDate hoje = LocalDate.now();
-
-        Streak streak = streakRepository.findByUserIdAndData(request.getUserId(), hoje)
-                .orElse(new Streak());
-
-        streak.setUser(user);
-        streak.setData(hoje);
-        streak.setTreinou(request.getTreinou());
-
-        Streak saved = streakRepository.save(streak);
-
-        return StreakResponse.fromEntity(saved);
-    }
-
-    public List<StreakResponse> historico(Long userId) {
-        return streakRepository.findByUserIdOrderByDataDesc(userId)
-                .stream()
-                .map(StreakResponse::fromEntity)
-                .toList();
+    public StreakService(WorkoutLogRepository workoutLogRepository) {
+        this.workoutLogRepository = workoutLogRepository;
     }
 
     public StreakSummaryResponse resumo(Long userId) {
-        List<Streak> registros = streakRepository.findByUserIdOrderByDataDesc(userId);
 
-        if (registros.isEmpty()) {
-            return new StreakSummaryResponse(
-                    userId,
-                    false,
-                    0,
-                    0,
-                    0,
-                    0,
-                    null
-            );
-        }
+        List<WorkoutLog> logs = workoutLogRepository.findByUserIdOrderByDataTreinoDesc(userId);
 
-        List<Streak> ordenados = registros.stream()
-                .sorted(Comparator.comparing(Streak::getData).reversed())
-                .toList();
+        Set<LocalDate> diasTreinados = logs.stream()
+                .map(WorkoutLog::getDataTreino)
+                .filter(data -> data != null)
+                .collect(Collectors.toSet());
 
         LocalDate hoje = LocalDate.now();
+        boolean treinouHoje = diasTreinados.contains(hoje);
 
-        Boolean treinouHoje = streakRepository.findByUserIdAndData(userId, hoje)
-                .map(Streak::getTreinou)
-                .orElse(false);
+        int sequenciaTreinando = 0;
 
-        int sequenciaTreinando = calcularSequencia(ordenados, true);
-        int sequenciaSemTreinar = calcularSequencia(ordenados, false);
+        LocalDate dataVerificacao = treinouHoje ? hoje : hoje.minusDays(1);
 
-        int totalDiasTreinados = (int) registros.stream()
-                .filter(streak -> Boolean.TRUE.equals(streak.getTreinou()))
-                .count();
+        while (diasTreinados.contains(dataVerificacao)) {
+            sequenciaTreinando++;
+            dataVerificacao = dataVerificacao.minusDays(1);
+        }
 
-        LocalDate ultimaData = ordenados.get(0).getData();
+        LocalDate ultimaData = diasTreinados.isEmpty() ? null : logs.get(0).getDataTreino();
 
         return new StreakSummaryResponse(
                 userId,
                 treinouHoje,
                 sequenciaTreinando,
-                sequenciaSemTreinar,
-                totalDiasTreinados,
-                registros.size(),
+                0,
+                diasTreinados.size(),
+                logs.size(),
                 ultimaData
         );
     }
 
-    private int calcularSequencia(List<Streak> registros, boolean valorEsperado) {
-        int sequencia = 0;
-        LocalDate dataEsperada = LocalDate.now();
+    public List<StreakResponse> historico(Long userId) {
+        List<WorkoutLog> logs = workoutLogRepository.findByUserIdOrderByDataTreinoDesc(userId);
+        Set<LocalDate> diasTreinados = logs.stream()
+                .map(WorkoutLog::getDataTreino)
+                .filter(data -> data != null)
+                .collect(Collectors.toSet());
 
-        for (Streak streak : registros) {
-            if (!streak.getData().equals(dataEsperada)) {
-                break;
-            }
+        List<StreakResponse> historicoRecente = new ArrayList<>();
+        LocalDate hoje = LocalDate.now();
 
-            if (Boolean.TRUE.equals(streak.getTreinou()) == valorEsperado) {
-                sequencia++;
-                dataEsperada = dataEsperada.minusDays(1);
-            } else {
-                break;
-            }
+
+        for (int i = 6; i >= 0; i--) {
+            LocalDate dia = hoje.minusDays(i);
+            boolean treinou = diasTreinados.contains(dia);
+
+            StreakResponse resp = new StreakResponse();
+            resp.setData(dia);
+            resp.setTreinou(treinou);
+            historicoRecente.add(resp);
         }
 
-        return sequencia;
+        return historicoRecente;
     }
 }
