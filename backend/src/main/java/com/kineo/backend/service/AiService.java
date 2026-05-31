@@ -12,11 +12,14 @@ import java.util.Map;
 @Service
 public class AiService {
 
-
+    private final RestTemplate restTemplate;
     private final String OLLAMA_URL = "http://localhost:11434/api/generate";
 
+    public AiService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
     public String perguntarAoOllama(String perguntaUsuario, boolean forcarJson) {
-        RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 

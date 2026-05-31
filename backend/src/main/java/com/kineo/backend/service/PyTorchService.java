@@ -13,10 +13,15 @@ import java.util.Map;
 @Service
 public class PyTorchService {
 
+    private final RestTemplate restTemplate;
+
+    public PyTorchService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
     // A MUDANÇA ESTÁ AQUI: Adicionámos o int falhasConsecutivas
     public Map<String, Object> preverProximaCarga(double cargaAtual, int diasTreinados, int metaReps, int repsFeitas, int falhasConsecutivas) {
 
-        RestTemplate restTemplate = new RestTemplate();
         String pythonMicroserviceUrl = "http://localhost:8000/prever";
 
         Map<String, Object> requestBody = new HashMap<>();
