@@ -4,10 +4,9 @@ import torch.optim as optim
 import pandas as pd
 from torch.utils.data import DataLoader, TensorDataset
 
-# 1. Carregar os Dados Biomecânicos
+# 1. Carregamento de dados
 df = pd.DataFrame(pd.read_csv('dataset_kineo_pro.csv'))
 
-# A MUDANÇA ESTÁ AQUI: Agora passamos 5 colunas para a IA aprender!
 X = df[['carga_atual', 'dias_treinados', 'meta_reps', 'reps_feitas', 'falhas_consecutivas']].values
 y = df[['proxima_carga']].values
 
@@ -21,7 +20,6 @@ loader = DataLoader(dataset, batch_size=64, shuffle=True)
 class KineoProAI(nn.Module):
     def __init__(self):
         super(KineoProAI, self).__init__()
-        # A MUDANÇA ESTÁ AQUI: 5 neurónios de entrada em vez de 4!
         self.camada1 = nn.Linear(5, 64)
         self.relu1 = nn.ReLU()
         self.camada2 = nn.Linear(64, 64) 
@@ -41,7 +39,7 @@ criterio = nn.MSELoss()
 otimizador = optim.AdamW(modelo.parameters(), lr=0.001)
 
 # 3. Treino
-print("Iniciando treinamento da Rede Neural Biomecânica...")
+print("Iniciando treinamento...")
 epochs = 200
 for epoch in range(epochs):
     loss_total = 0
@@ -57,4 +55,4 @@ for epoch in range(epochs):
         print(f'Época {epoch+1}/{epochs} | Erro Médio: {loss_total/len(loader):.4f}')
 
 torch.save(modelo.state_dict(), 'modelo_kineo_pro.pth')
-print("Treinamento concluído! A nova IA KINEO está pronta e consciente do contexto.")
+print("Treinamento concluído!")
